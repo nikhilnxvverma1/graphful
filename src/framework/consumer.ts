@@ -1,8 +1,41 @@
 import { GFStatement } from './statement';
+import * as lexer from './compiler/lexical-analyzer';
+import * as parser from './compiler/syntax-parser';
 
 export class GFConsumer{
 	input:string;
 	output:GFStatement[];
 
 	//TODO compiling method
+
+	parseFieldMember(input:string):any{
+		console.log("Parsing for field member "+input);
+		var lexemeList=lexer.getLexemeList(input);
+		for(var lexeme of lexemeList){
+			console.log(lexeme);
+		}
+
+		var cfg=this.makeDummyGrammer();
+		var parseTree=cfg.parse("--++");
+		console.log(parseTree);
+		return null;
+	}
+
+	makeDummyGrammer():parser.ContextFreeGrammer{
+		var s=new parser.NonTerminal(0);
+		var a=new parser.NonTerminal(1);
+
+		var ta=new parser.Terminal(lexer.LexemeType.Minus);
+		var tb=new parser.Terminal(lexer.LexemeType.Plus);
+
+		var cfg=new parser.ContextFreeGrammer(s);
+		cfg.variableList.push(s,a);
+		cfg.terminalList.push(ta,tb);
+
+		cfg.relation.push(new parser.Rule(s,a,a));
+		cfg.relation.push(new parser.Rule(a,ta,a));
+		cfg.relation.push(new parser.Rule(a,tb));
+		cfg.finalizeGrammer();
+		return cfg;
+	}
 }
