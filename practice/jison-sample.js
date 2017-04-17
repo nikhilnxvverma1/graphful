@@ -13,10 +13,14 @@ var grammer={
 	}
 };
 
+
 var parser=new Parser(grammer);
 
+var parserSource = parser.generate();
 
-parser.parse("adfe34bc e82a");
+var parseTree=parser.parse("adfe34bc e82a");
+
+console.log("parse tree is "+parseTree);
 
 //this will throw an exception
 // parser.parse("adfe34bc zxg");
