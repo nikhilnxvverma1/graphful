@@ -127,6 +127,37 @@ export class ContextFreeGrammer{
 		this.start=start;
 	}
 
+	/** Generates CFG data structure from a space sepearated list of rule .strings. NO error checking */
+	static grammerFrom(ruleList:string):ContextFreeGrammer{
+
+		//collect all non terminals and terminals first
+		const cfg=new ContextFreeGrammer(null);//we will fill in the starting non terminal later
+		for(let rule of ruleList){
+			const elementList=rule.split(" ");
+			
+			for(let element of elementList){
+
+				if(element.startsWith("$")){ //terminal following $ symbol
+					let lexemeType=Number.parseInt(element.substr(1));
+					let terminal=new Terminal(lexemeType);
+					cfg.insertIfTerminalIsAbsent(terminal);
+				}else if(element!="->"){
+					let nonTerminal=new NonTerminal(23);//TODO
+					cfg.insertIfNonTerminalIsAbsent(nonTerminal);
+				}
+			}
+		}
+		return null;
+	}
+
+	private insertIfTerminalIsAbsent(terminal:Terminal):boolean{
+		return false;
+	}
+
+	private insertIfNonTerminalIsAbsent(nonTerminal:NonTerminal):boolean{
+		return false;
+	}
+
 	/** Simply prints out the rules line by line */
 	printRules(){
 		for(let rule of this.relation){
