@@ -20,6 +20,8 @@ export class NonTerminal implements SyntaxElement{
 	id:number;
 	/** Index of this node in parser tables. This should only be set by the ParserTable class */
 	tableIndex:number;
+	/** Name of non terminal for alternate identification purposes*/
+	representation:string;
 
 	/**
 	 * Constructs a non terminal with a representational id.
@@ -92,11 +94,6 @@ export class Rule{
 	 */
 	ruleIndex:number;
 
-	constructor(from:NonTerminal,...goesTo:SyntaxElement[]){
-		this.lhs=from;
-		this.rhs=goesTo;
-	}
-
 	toString():string{
 		var line=this.lhs.toString();
 		line+=" -> "
@@ -128,34 +125,88 @@ export class ContextFreeGrammer{
 	}
 
 	/** Generates CFG data structure from a space sepearated list of rule .strings. NO error checking */
-	static grammerFrom(ruleList:string):ContextFreeGrammer{
+	static grammerFrom(ruleStringList:string[]):ContextFreeGrammer{
 
-		//collect all non terminals and terminals first
-		const cfg=new ContextFreeGrammer(null);//we will fill in the starting non terminal later
-		for(let rule of ruleList){
-			const elementList=rule.split(" ");
-			
-			for(let element of elementList){
+		//break multiple rules into simpler smaller parts
+		let expandedRuleString:string[]=[];
+		for(let ruleString of ruleStringList){
 
-				if(element.startsWith("$")){ //terminal following $ symbol
-					let lexemeType=Number.parseInt(element.substr(1));
-					let terminal=new Terminal(lexemeType);
-					cfg.insertIfTerminalIsAbsent(terminal);
-				}else if(element!="->"){
-					let nonTerminal=new NonTerminal(23);//TODO
-					cfg.insertIfNonTerminalIsAbsent(nonTerminal);
+			let lhsRhs = ruleString.split("->");
+			let lhs = lhsRhs[0];
+			let rhsGroup = lhsRhs[1];
+
+			//break rhs and expand by splitting across pipe symbols
+			let rhsList = rhsGroup.split("|");
+
+			//expand multiple rules by breaking the rhs
+			if(rhsList.length>1){
+				for(let rhs of rhsList){
+					let simplifiedRuleString = lhs +" -> "+ rhs;
+					expandedRuleString.push(simplifiedRuleString);
 				}
+			}else{
+				expandedRuleString.push(ruleString);
 			}
 		}
-		return null;
+
+		let cfg=new ContextFreeGrammer(null);//we will fill in the starting non terminal later
+		for(let ruleString of expandedRuleString){
+			let lhsRhs = ruleString.split("->");
+			let lhs = lhsRhs[0].trim();
+			let rhs = lhsRhs[1].trim();
+
+			let newRule=new Rule();
+			newRule.lhs=cfg.getNonTerminalOrInsertIfNeeded(lhs);
+			newRule.rhs=[];
+			//break the rhs into individual parts
+			let rhsParts = rhs.split(" ");
+			
+			for(let rhsPart of rhsParts){
+
+				rhsPart.trim();//remove the spaces if they exist around the boundaries of the word
+
+				if(rhsPart.startsWith("$")){ //terminal following $ symbol
+					let lexemeType = Number.parseInt(rhsPart.substr(1));
+					let terminal = cfg.getTerminalOrInsertIfNeeded(lexemeType);
+					newRule.rhs.push(terminal);
+				}else{
+					let nonTerminal=cfg.getNonTerminalOrInsertIfNeeded(rhsPart)
+					newRule.rhs.push(nonTerminal);
+				}
+
+			}
+			
+			cfg.relation.push(newRule);
+		}
+
+		return cfg;
 	}
 
-	private insertIfTerminalIsAbsent(terminal:Terminal):boolean{
-		return false;
+	private getTerminalOrInsertIfNeeded(lexemeType:LexemeType):Terminal{
+		for(let terminal of this.terminalList){
+			if(terminal.token==lexemeType){
+				return terminal;
+			}
+		}
+		let newTerminal = new Terminal(lexemeType);
+		this.terminalList.push(newTerminal);
+		return newTerminal;
 	}
 
-	private insertIfNonTerminalIsAbsent(nonTerminal:NonTerminal):boolean{
-		return false;
+	private getNonTerminalOrInsertIfNeeded(representation:string):NonTerminal{
+		let maxId=-1;
+		for(let nonTerminal of this.variableList){
+			if(representation==nonTerminal.representation){
+				return nonTerminal;
+			}
+			if(nonTerminal.id>=maxId){
+				maxId=nonTerminal.id;
+			}
+		}
+		let newNonTerminal = new NonTerminal(maxId+1);
+		newNonTerminal.representation=representation;
+		this.variableList.push(newNonTerminal);
+		return newNonTerminal;
 	}
 
 	/** Simply prints out the rules line by line */
@@ -215,7 +266,11 @@ export class ContextFreeGrammer{
 		var sPrime=new NonTerminal(-1);//-1 indicates augumented start rule
 		//its IMPORTANT to insert the new augumented rule at the start
 		this.variableList.unshift(sPrime);
-		this.relation.unshift(new Rule(sPrime,this.start));
+
+		let newStart = new Rule();
+		newStart.lhs=sPrime;
+		newStart.rhs=[this.start];
+		this.relation.unshift(newStart);
 		this.start=sPrime;
 		return sPrime; 
 	}
