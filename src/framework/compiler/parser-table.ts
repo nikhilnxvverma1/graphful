@@ -41,7 +41,6 @@ export class ParserTable{
 
 	constructor(cfg:ContextFreeGrammer){
 		this.cfg=cfg;
-		
 		//set the indices and get table length
 		this.setIndices();
 
@@ -118,6 +117,7 @@ export class ParserTable{
 
 			//pop from unprocessed and push to processed before  adding new states
 			var state=unprocessedStates.pop();
+			console.log(state);
 			processedStates.push(state);
 			state.stateNo=stateCount++;
 
@@ -326,11 +326,11 @@ class LR1Item{
 	toString():string{
 		var rhsProgress="";
 		for(var i=0;i<this.dot;i++){
-			rhsProgress+=this.rule.rhs[i].toString();//+" ";
+			rhsProgress+=this.rule.rhs[i].toString()+" ";
 		}
 		rhsProgress+=".";
 		while(i<this.rule.rhs.length){
-			rhsProgress+=this.rule.rhs[i].toString();//+" ";
+			rhsProgress+=this.rule.rhs[i].toString()+" ";
 			i++;
 		}
 		return this.rule.lhs.toString()+"->"+rhsProgress+","+util.csv(this.lookaheads," ");
@@ -381,6 +381,15 @@ class ParsingState{
 
 	/** Recursively finds and adds all LR(1) items by looking at the position of the dot */
 	private closure(item:LR1Item,cfg:ContextFreeGrammer){
+		
+		/*
+		 * In finding closure, if the element after dot is a non terminal element,
+		 * we find all the rules that contain that non terminal on the LHS.
+		 * For each such rule, we place the dot at the beginning, thereby creating new 
+		 * (derived) LR1 Items. Each LR1 Item also requires a set of lookaheads.
+		 * 
+		 */
+
 		if(item.dotBeforeSyntaxElement()){
 
 			//check the item after the dot
@@ -392,6 +401,7 @@ class ParsingState{
 
 				//for each variable rule, 
 				for(let variableRule of variableRules){
+
 
 					//make an LR(1) item with dot placed at the beginning,
 					var derived=new LR1Item(variableRule,0);
@@ -427,13 +437,17 @@ class ParsingState{
 					}else{
 						derivedsLookaheads=item.lookaheads;//TODO same object may cause problems later if changes are made
 					}
-
 					//set the lookaheads for the derived items 
 					derived.lookaheads=derivedsLookaheads;
 
+					//don't repeat the same item, otherwise it will go in infinite recursion
+					if(item.equals(derived)){
+						continue;
+					}
+
 					//add this item to the set
 					this.itemList.push(derived);
-
+					
 					//and find its closure recursively
 					this.closure(derived,cfg);
 				}

@@ -36,11 +36,18 @@ export class NonTerminal implements SyntaxElement{
 	}
 
 	toString():string{
-		if(this.isAugumentedVariable()){
-			return "A'";
+
+		// use only if available
+		if(this.representation!=null){
+			return this.representation;
+		}else{
+			//otherwise fallback to index based naming
+			if(this.isAugumentedVariable()){
+				return "A'";
+			}
+			var startLetter="A";
+			return String.fromCharCode(startLetter.charCodeAt(0)+this.id);
 		}
-		var startLetter="A";
-		return String.fromCharCode(startLetter.charCodeAt(0)+this.id);
 	}
 
 	isAugumentedVariable():boolean{
@@ -120,10 +127,6 @@ export class ContextFreeGrammer{
 	/** Parsing table is constructed once and used several times */
 	private parserTable:ParserTable;
 
-	constructor(start:NonTerminal){
-		this.start=start;
-	}
-
 	/** Generates CFG data structure from a space sepearated list of rule .strings. NO error checking */
 	static grammerFrom(ruleStringList:string[]):ContextFreeGrammer{
 
@@ -149,7 +152,7 @@ export class ContextFreeGrammer{
 			}
 		}
 
-		let cfg=new ContextFreeGrammer(null);//we will fill in the starting non terminal later
+		let cfg=new ContextFreeGrammer();
 		for(let ruleString of expandedRuleString){
 			let lhsRhs = ruleString.split("->");
 			let lhs = lhsRhs[0].trim();
@@ -178,6 +181,12 @@ export class ContextFreeGrammer{
 			
 			cfg.relation.push(newRule);
 		}
+		//we will fill in the starting non terminal (if the rules list is not empty)
+		if(cfg.relation.length>0){
+			cfg.start=cfg.relation[0].lhs;
+		}
+
+		cfg.finalizeGrammer();
 
 		return cfg;
 	}
