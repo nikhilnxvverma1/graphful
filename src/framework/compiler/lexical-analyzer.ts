@@ -119,6 +119,10 @@ export class Lexeme{
 	toString():string{
 		return this.type+" ";
 	}
+
+	valueIn(input:string):string{
+		return input.substr(this.start,this.length);
+	}
 }
 
 class Keyword{
