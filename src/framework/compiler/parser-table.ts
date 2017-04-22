@@ -109,7 +109,7 @@ export class ParserTable{
 		firstItem.lookaheads.push(this.cfg.eof);
 
 		//closure is found internally inside the constructor
-		var firstState=new ParsingState(firstItem,this.cfg);
+		var firstState=new ParsingState([firstItem],this.cfg);
 
 		//find the outgoing transitions for all the unprocessed states 
 		unprocessedStates.push(firstState);
@@ -136,7 +136,9 @@ export class ParserTable{
 						outgoing.to=existing;
 					}else{
 						//otherwise add the new state to unprocessed list
-						unprocessedStates.push(outgoing.to);
+						//this must be added in the beginning, otherwise it would lead 
+						//to closure being done from the opposite direction
+						unprocessedStates.unshift(outgoing.to);
 					}
 				}
 			}
@@ -154,14 +156,22 @@ export class ParserTable{
 	/** Uses the LR(1) state diagram to fill entries in the parsing table */
 	private fillTableUsing(stateDiagram:ParsingState[]){
 
+		/* By using the state diagram constructed so far, we make a tabular representation of
+			our CFG. This is later used by the parser to figure out which state to jump to in our 
+			state diagram as we are scanning through the input.If the last state we land on happens 
+			to be the final state, the input is said to have passed. During this process, we also 
+			construct the parse tree as a byproduct
+		 */
+
 		//initialize the 2d table
 		for(var i=0;i<stateDiagram.length;i++){//as many row as are states
 			this.makeNewRow();
 		}
 
+		console.log("Making parsing table using the state diagram");
 		//for each state
 		for(let state of stateDiagram){
-
+			
 			if(state.isFinalState()){
 				//get the only first entry from the state
 				var item=state.itemList[0];
@@ -208,15 +218,26 @@ export class ParserTable{
 	private printStateDiagram(stateList:ParsingState[]){
 		console.log("LR(1) State Diagram. Total States: "+stateList.length);
 
+		let i=0;
 		//go to each state
-		for(let state of stateList){			
-			//print transition between states for this state
-			for(let transition of state.transitions){
-				console.log(state.stateNo+" "+
-				transition.syntaxElement.toString()+
-				" > "+
-				transition.to.stateNo);
+		for(let state of stateList){
+
+			console.log("S"+i++);
+			for(let item of state.itemList){
+				console.log(item.toString());
 			}
+
+			//print transition between states for this state
+			let transitionCSV="";
+			for(let transition of state.transitions){
+				// console.log(state.stateNo+" "+
+				// transition.syntaxElement.toString()+
+				// " > "+
+				// transition.to.stateNo);
+				;
+				transitionCSV+="("+transition.syntaxElement.toString()+")"+transition.to.stateNo+",";
+			}
+			console.log(transitionCSV);
 		}
 	}
 
@@ -343,9 +364,11 @@ class ParsingState{
 	itemList:LR1Item[]=[];
 	transitions:ParsingTransition[]=[];
 
-	constructor(firstItem:LR1Item,cfg:ContextFreeGrammer){
-		this.itemList.push(firstItem);
-		this.closure(firstItem,cfg);//only first item is not derived
+	constructor(itemList:LR1Item[],cfg:ContextFreeGrammer){
+		this.itemList=itemList;
+		for(let item of this.itemList){
+			this.closure(item,cfg);
+		}
 	}
 
 	/** A final state is one which has a single item where the dot is at the end */
@@ -447,7 +470,7 @@ class ParsingState{
 
 					//add this item to the set
 					this.itemList.push(derived);
-					
+
 					//and find its closure recursively
 					this.closure(derived,cfg);
 				}
@@ -486,7 +509,7 @@ class ParsingTransition{
 			}
 
 			//create a new outgoing state for the proceeded item
-			this.to=new ParsingState(proceededItem,cfg);
+			this.to=new ParsingState([proceededItem],cfg);
 		}
 	}
 

@@ -43,7 +43,7 @@ export class NonTerminal implements SyntaxElement{
 		}else{
 			//otherwise fallback to index based naming
 			if(this.isAugumentedVariable()){
-				return "A'";
+				return "S'";
 			}
 			var startLetter="A";
 			return String.fromCharCode(startLetter.charCodeAt(0)+this.id);

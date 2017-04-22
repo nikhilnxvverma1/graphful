@@ -89,7 +89,7 @@ export function stringForLexemeType(type:LexemeType):string{
 		case LexemeType.OpeningMultiLineComment:return "/*";
 		case LexemeType.ClosingMultiLineComment:return "*/";
 
-		case LexemeType.EOF:return "EOF";
+		case LexemeType.EOF:return "$";//return "EOF";
 	}
 
 	return null;
