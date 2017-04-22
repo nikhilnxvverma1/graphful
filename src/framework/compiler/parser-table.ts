@@ -104,33 +104,34 @@ export class ParserTable{
 		var processedStates:ParsingState[]=[];
 		var unprocessedStates:ParsingState[]=[];
 
-		//create the first state by finding the closure of the first rule
-		var firstItem=new LR1Item(this.cfg.relation[0],0);
-		firstItem.lookaheads.push(this.cfg.eof);
+		//create the first LR1 item by placing the dot at the first symbol of the augumented rule
+		let initialItem=new LR1Item(this.cfg.relation[0],0);
+		initialItem.lookaheads.push(this.cfg.eof);
 
 		//closure is found internally inside the constructor
-		var firstState=new ParsingState([firstItem],this.cfg);
+		var firstState=new ParsingState([initialItem],this.cfg);
 
 		//find the outgoing transitions for all the unprocessed states 
 		unprocessedStates.push(firstState);
 		while(unprocessedStates.length!=0){
 
 			//pop from unprocessed and push to processed before  adding new states
-			var state=unprocessedStates.pop();
-			console.log(state);
+			let state=unprocessedStates.pop();
 			processedStates.push(state);
 			state.stateNo=stateCount++;
 
-			//for each LR(1) item of this state, find outgoing states 
-			for(let item of state.itemList){
-				var outgoing=item.proceed(this.cfg);
-				if(outgoing!=null){
-					//add this transition to the current state's transition list
-					outgoing.from=state;
-					state.transitions.push(outgoing);//note that this is a transition and not a state
+			//we will use the symbols after the dot in each item of this state, to determine the next propogating states
+			let beforeDotSymbols = state.getRespectiveSymbolsPostDot(this.cfg);
+			let yieldedNewStates = false;
 
+			for(let symbol of beforeDotSymbols){
+				let outgoing=state.transitionFor(symbol,this.cfg);
+				if(outgoing!=null){
+					yieldedNewStates=true;
+
+					state.transitions.push(outgoing);//note that this is a transition and not a state
 					//check if this state already exists
-					var existing=this.findMatchingState(outgoing.to,processedStates);
+					let existing=this.findMatchingState(outgoing.to,processedStates,unprocessedStates);
 					if(existing!=null){
 						//use existing state if they exist, 
 						outgoing.to=existing;
@@ -142,6 +143,10 @@ export class ParserTable{
 					}
 				}
 			}
+
+			//after finding all the possible transitions
+			state.finalState = !yieldedNewStates;
+
 		}
 
 		this.fillTableUsing(processedStates);
@@ -168,11 +173,10 @@ export class ParserTable{
 			this.makeNewRow();
 		}
 
-		console.log("Making parsing table using the state diagram");
 		//for each state
 		for(let state of stateDiagram){
 			
-			if(state.isFinalState()){
+			if(state.finalState){
 				//get the only first entry from the state
 				var item=state.itemList[0];
 				if(item.rule.ruleIndex==0){//accept entry (starting rule)
@@ -230,11 +234,6 @@ export class ParserTable{
 			//print transition between states for this state
 			let transitionCSV="";
 			for(let transition of state.transitions){
-				// console.log(state.stateNo+" "+
-				// transition.syntaxElement.toString()+
-				// " > "+
-				// transition.to.stateNo);
-				;
 				transitionCSV+="("+transition.syntaxElement.toString()+")"+transition.to.stateNo+",";
 			}
 			console.log(transitionCSV);
@@ -267,9 +266,18 @@ export class ParserTable{
 		}
 	}
 
-	/** Finds the matching state from a list of states, if exists */
-	private findMatchingState(parsingState:ParsingState,list:ParsingState[]):ParsingState{
-		for(let stateInList of list){
+	/** Finds the matching state from a any list of states, if exists */
+	private findMatchingState(parsingState:ParsingState,list1:ParsingState[],list2:ParsingState[]):ParsingState{
+
+		//check if its in first list
+		for(let stateInList of list1){
+			if(parsingState!=stateInList && parsingState.equals(stateInList)){
+				return stateInList;
+			}
+		}
+
+		//check if its in second list
+		for(let stateInList of list2){
 			if(parsingState!=stateInList && parsingState.equals(stateInList)){
 				return stateInList;
 			}
@@ -318,12 +326,15 @@ class LR1Item{
 	}
 
 	/**
-	 * Proceeds the cursor(dot) one step to produce a parsing transition
-	 * to a new state . The transition returned has an empty 'from' state.
+	 * Proceeds the cursor(dot) one step to produce a new item.
+	 * During this process, the new lookaheads are also computed
 	 */
-	proceed(cfg:ContextFreeGrammer):ParsingTransition{
+	proceed():LR1Item{
 		if(this.dot<this.rule.rhs.length){
-			return new ParsingTransition(this,cfg);
+
+			let proceeded=new LR1Item(this.rule,this.dot+1);
+			proceeded.lookaheads=this.lookaheads;
+			return proceeded;
 		}
 		return null;
 	}
@@ -363,9 +374,16 @@ class ParsingState{
 	stateNo:number;
 	itemList:LR1Item[]=[];
 	transitions:ParsingTransition[]=[];
+	/** Wether this state yields any new state or not (as determined by the construction algorithm) */
+	finalState:boolean;
 
 	constructor(itemList:LR1Item[],cfg:ContextFreeGrammer){
 		this.itemList=itemList;
+		this.findClosure(cfg);
+	}
+
+	/** In finding the closure, it computes new lookahead symbols */
+	private findClosure(cfg:ContextFreeGrammer){
 		for(let item of this.itemList){
 			this.closure(item,cfg);
 		}
@@ -374,6 +392,55 @@ class ParsingState{
 	/** A final state is one which has a single item where the dot is at the end */
 	isFinalState():boolean{
 		return this.itemList.length==1 && !this.itemList[0].dotBeforeSyntaxElement();
+	}
+
+	/** 
+	 * For all the items in this state, it returns a respective list of syntax elements that appear after the dot in each.
+	 * The symbols is EOF if the dot is in the end.
+	 */
+	getRespectiveSymbolsPostDot(cfg:ContextFreeGrammer):SyntaxElement[]{
+		let symbolsAfterDot:SyntaxElement[]=[];
+		for(let item of this.itemList){
+			let elementAfterDot=item.elementAfterDot();
+
+			if(elementAfterDot!=null){
+				symbolsAfterDot.push(elementAfterDot);
+			}else{
+				symbolsAfterDot.push(cfg.eof);
+			}
+		}
+		return symbolsAfterDot;
+	}
+
+	/** 
+	 * Computes and returns the transition to the next state for a given syntax element.
+	 */
+	transitionFor(syntaxElement:SyntaxElement,cfg:ContextFreeGrammer):ParsingTransition{
+
+		//find all the items for which the given syntax element is exactly before the dot
+		let coveredItems:LR1Item[]=[];
+		for(let item of this.itemList){
+			if(item.elementAfterDot()==syntaxElement){
+				coveredItems.push(item);
+			}
+		}
+
+		//(an empty list indicates a final state)
+		if(coveredItems.length>0){
+
+			//proceed each covered item and create new list of proceeeded items
+			let proceededItems:LR1Item[]=[];
+			for(let item of coveredItems){
+				proceededItems.push(item.proceed());
+			}
+
+			//for the covered items, create a new state 
+			let nextState=new ParsingState(proceededItems,cfg);//the closure is found inside
+
+			//create a new transition for this syntax element and return
+			return new ParsingTransition(this,nextState,syntaxElement);
+		}
+		return null;
 	}
 
 	/** Checks if the two states are same by comparing only their LR(1) item set */
@@ -463,19 +530,24 @@ class ParsingState{
 					//set the lookaheads for the derived items 
 					derived.lookaheads=derivedsLookaheads;
 
-					//don't repeat the same item, otherwise it will go in infinite recursion
-					if(item.equals(derived)){
-						continue;
+					//add this item to the set only if it is unique
+					if(!this.contains(derived)){
+						this.itemList.push(derived);
+						//and find its closure recursively
+						this.closure(derived,cfg);
 					}
-
-					//add this item to the set
-					this.itemList.push(derived);
-
-					//and find its closure recursively
-					this.closure(derived,cfg);
 				}
 			}
 		}
+	}
+
+	contains(possible:LR1Item):boolean{
+		for(let item of this.itemList){
+			if(item.equals(possible)){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	toString():string{
@@ -494,23 +566,10 @@ class ParsingTransition{
 	from:ParsingState;
 	to:ParsingState;
 
-	constructor(item:LR1Item,cfg:ContextFreeGrammer){
-		if(item.dotBeforeSyntaxElement()){
-
-			//set the syntax element as the current position of the dot
-			this.syntaxElement=item.elementAfterDot();
-
-			//create a new LR(1) item which is a proceeded version of given item
-			var proceededItem=new LR1Item(item.rule,item.dot+1);
-
-			//while transitioning, the lookaheads dont change
-			for(let lookahead of item.lookaheads){
-				proceededItem.lookaheads.push(lookahead);
-			}
-
-			//create a new outgoing state for the proceeded item
-			this.to=new ParsingState([proceededItem],cfg);
-		}
+	constructor(from:ParsingState,to:ParsingState,forElement:SyntaxElement){
+		this.from=from;
+		this.to=to;
+		this.syntaxElement=forElement;
 	}
 
 	toString():string{
