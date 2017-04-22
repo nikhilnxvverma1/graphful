@@ -173,12 +173,30 @@ export class ParserTable{
 			this.makeNewRow();
 		}
 
-		//for each state
+		//mark all shift entries in the table
 		for(let state of stateDiagram){
 			
-			if(state.finalState){
-				//get the only first entry from the state
-				var item=state.itemList[0];
+			//check all its transitions 
+			for(let transition of state.transitions){
+				//if the outgoing symbol is a non terminal
+				if(transition.syntaxElement.getType()==SyntaxElementType.NonTerminal){//goto entry 
+					this.setGoto(
+						state.stateNo,
+						<NonTerminal>transition.syntaxElement,
+						transition.to.stateNo);
+				}else{//(terminal or epsilon) : shift entry
+					this.setAction(
+						state.stateNo,
+						<Terminal>transition.syntaxElement,
+						ParserTableValueType.Shift,
+						transition.to.stateNo);
+				}
+			}
+
+			//find all items of this state that have dot at the end
+			let finishedItems=state.finsihedItems();
+			for(let item of finishedItems){
+
 				if(item.rule.ruleIndex==0){//accept entry (starting rule)
 					this.setAction(
 						state.stateNo,
@@ -186,8 +204,7 @@ export class ParserTable{
 						ParserTableValueType.Accept,
 						-1);
 				}else{//reduce entry
-
-					// set the reduce entries only under the lookahead symbols
+					//only under the lookahead symbols
 					for(let lookahead of item.lookaheads){
 						this.setAction(
 							state.stateNo,
@@ -196,24 +213,7 @@ export class ParserTable{
 							item.rule.ruleIndex);
 					}
 				}
-			}else{
-				//check all its transitions 
-				for(let transition of state.transitions){
-					//if the outgoing symbol is a non terminal
-					if(transition.syntaxElement.getType()==SyntaxElementType.NonTerminal){//goto entry 
-						this.setGoto(
-							state.stateNo,
-							<NonTerminal>transition.syntaxElement,
-							transition.to.stateNo);
-					}else{//(terminal or epsilon) : shift entry
-						this.setAction(
-							state.stateNo,
-							<Terminal>transition.syntaxElement,
-							ParserTableValueType.Shift,
-							transition.to.stateNo);
-					}
-				}
-				
+
 			}
 		}
 	}
@@ -339,6 +339,11 @@ class LR1Item{
 		return null;
 	}
 
+	/** Checks dot position by comparing with the length of the rhs of the rule */
+	dotAtTheEnd():boolean{
+		return this.dot==this.rule.rhs.length;
+	}
+
 	/** 
 	 * Gives the element after dot.Optionally, you can also skip elements(default is 0).
 	 * Gives null if dot(plus skip) is beyond the length of RHS
@@ -410,6 +415,17 @@ class ParsingState{
 			}
 		}
 		return symbolsAfterDot;
+	}
+
+	/** Returns list of items that have dots at the end */
+	finsihedItems():LR1Item[]{
+		let finishedItems:LR1Item[]=[];
+		for(let item of this.itemList){
+			if(item.dotAtTheEnd()){
+				finishedItems.push(item);
+			}
+		}
+		return finishedItems;
 	}
 
 	/** 
