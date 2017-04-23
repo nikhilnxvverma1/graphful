@@ -2,6 +2,7 @@ import { Component,OnInit } from '@angular/core';
 import { getLexemeList } from '../framework/compiler/lexical-analyzer';
 import * as sp from '../framework/compiler/syntax-parser';
 import {SimpleCalculator} from '../framework/compiler/simple-calculator';
+import { GFConsumer } from '../framework/consumer';
 
 @Component({
   selector: 'app-root',
@@ -13,7 +14,8 @@ export class AppComponent implements OnInit{
 
 	ngOnInit(){
 		// this.testMathExpression();
-		this.computeMathExpression("2-9+5-5+12");
+		// this.computeMathExpression("2-9+5-5+12");
+		this.testGraphfulExpression("[sdfg[gsfg]]");
 	}
 
 	testMathExpression(){
@@ -45,5 +47,15 @@ export class AppComponent implements OnInit{
 			console.log("Expression is invalid as per the context free grammer");
 		}
 		
+	}
+
+	testGraphfulExpression(input:string){
+		let consumer=new GFConsumer(input);
+		let passed=consumer.compile();
+		if(passed){
+			console.log("grammer passed");
+		}else{
+			console.log("grammer failed");
+		}
 	}
 }

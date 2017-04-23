@@ -2,40 +2,31 @@ import { GFStatement } from './statement';
 import * as lexer from './compiler/lexical-analyzer';
 import * as parser from './compiler/syntax-parser';
 
-export class GFConsumer{
-	input:string;
-	output:GFStatement[];
+const NODE = "Node";
 
-	//TODO compiling method
 
-	parseFieldMember(input:string):any{
-		console.log("Parsing for field member "+input);
-		var lexemeList=lexer.getLexemeList(input);
-		for(var lexeme of lexemeList){
-			console.log(lexeme);
+/** Spits out a bunch of graphful statements after compiling them internally */
+export class GFConsumer {
+
+	input: string;
+	output: GFStatement[];
+	static readonly ruleList = [
+		`${NODE} -> $19 ${NODE} $20 | $3 ${NODE} | $3`
+	];
+
+	static readonly cfg = parser.ContextFreeGrammer.grammerFrom(GFConsumer.ruleList);
+
+	constructor(input: string) {
+		this.input = input;
+	}
+
+	compile(): boolean {
+		let parsingResult = GFConsumer.cfg.parse(this.input);
+		console.log(parsingResult);
+		if (parsingResult.status == parser.ParsingStatus.Passed) {
+			return true;
 		}
-
-		var cfg=this.makeDummyGrammer();
-		var parseTree=cfg.parse("--++");
-		console.log(parseTree);
-		return null;
+		return false;
 	}
 
-	makeDummyGrammer():parser.ContextFreeGrammer{
-		var s=new parser.NonTerminal(0);
-		var a=new parser.NonTerminal(1);
-
-		var ta=new parser.Terminal(lexer.LexemeType.Minus);
-		var tb=new parser.Terminal(lexer.LexemeType.Plus);
-
-		var cfg=new parser.ContextFreeGrammer(s);
-		cfg.variableList.push(s,a);
-		cfg.terminalList.push(ta,tb);
-
-		cfg.relation.push(new parser.Rule(s,a,a));
-		cfg.relation.push(new parser.Rule(a,ta,a));
-		cfg.relation.push(new parser.Rule(a,tb));
-		cfg.finalizeGrammer();
-		return cfg;
-	}
 }

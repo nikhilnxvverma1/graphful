@@ -112,3 +112,12 @@ export function removeFromList(item:any,list:any[],logError?:string):boolean{
 	}
 	return false;
 }
+
+/**Produces a CSV of whatever attribute is of interest in the list of items*/
+export function produceCsvOf(list:any[],valuePerElement:(element:any)=>string):string{
+	let csv='';
+	for(let item of list){
+		csv+=valuePerElement(item)+",";
+	}
+	return csv;
+}

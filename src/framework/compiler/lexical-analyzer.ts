@@ -1,8 +1,6 @@
-
-
 /** Each lexeme can be identified by its type. These help in easily categorising the different tokens in a string. */
 export enum LexemeType{ //debugging tip: use this line number to derive the number for the enum constant
-	Identifier=1,	//alphanumeric starting with a letter,underscore accepted
+	Identifier=3,	//alphanumeric starting with a letter,underscore accepted
 	Number,// any integer number
 	Unknown,// just anything, this has the lease priority 
 	Minus,//-
@@ -24,20 +22,8 @@ export enum LexemeType{ //debugging tip: use this line number to derive the numb
 	ClosingAngularBracket,//>
 	OpeningCurvedBracket,//(
 	ClosingCurvedBracket,//)
-	DoubleOpeningSquareBracket,//[[
-	DoubleClosingSquareBracket,//]]
-	DoubleOpeningAngularBracket,//<<
-	DoubleClosingAngularBracket,//>>
-	DoubleOpeningCurvedBracket,//((
-	DoubleClosingCurvedBracket,//))
 	Interface,//interface
 	Enumeration,//enumeration
-	UserSymbol,//o<<
-	DatabaseSymbol,//o((
-	Arrow,//-->
-	Line,//---
-	Dotted,//...
-	DoubleSlash,// //
 	OpeningMultiLineComment,// /*
 	ClosingMultiLineComment,// */
 	EOF//End of File, artificial and used exclusively by parser
@@ -72,20 +58,8 @@ export function stringForLexemeType(type:LexemeType):string{
 		case LexemeType.ClosingAngularBracket:return ">";
 		case LexemeType.OpeningCurvedBracket:return "(";
 		case LexemeType.ClosingCurvedBracket:return ")";
-		case LexemeType.DoubleOpeningSquareBracket:return "[[";
-		case LexemeType.DoubleClosingSquareBracket:return "]]";
-		case LexemeType.DoubleOpeningAngularBracket:return "<<";
-		case LexemeType.DoubleClosingAngularBracket:return ">>";
-		case LexemeType.DoubleOpeningCurvedBracket:return "((";
-		case LexemeType.DoubleClosingCurvedBracket:return "))";
 		case LexemeType.Interface:return "interface";
 		case LexemeType.Enumeration:return "enumeration";
-		case LexemeType.UserSymbol:return "o<<";
-		case LexemeType.DatabaseSymbol:return "o((";
-		case LexemeType.Arrow:return "-->";
-		case LexemeType.Line:return "---";
-		case LexemeType.Dotted:return "...";
-		case LexemeType.DoubleSlash:return "//";
 		case LexemeType.OpeningMultiLineComment:return "/*";
 		case LexemeType.ClosingMultiLineComment:return "*/";
 
@@ -167,12 +141,6 @@ var keywordList:Keyword[]=[
 	new Keyword(":",LexemeType.Colon),
 	new Keyword(",",LexemeType.Comma),
 	new Keyword("*",LexemeType.Star),
-	new Keyword("o<<",LexemeType.UserSymbol),
-	new Keyword("o((",LexemeType.DatabaseSymbol),
-	new Keyword("-->",LexemeType.Arrow),
-	new Keyword("---",LexemeType.Line),
-	new Keyword("...",LexemeType.Dotted),
-	new Keyword("//",LexemeType.DoubleSlash),
 	new Keyword("/*",LexemeType.OpeningMultiLineComment),
 	new Keyword("*/",LexemeType.ClosingMultiLineComment),
 	new Keyword("[",LexemeType.OpeningSquareBracket),
@@ -181,12 +149,6 @@ var keywordList:Keyword[]=[
 	new Keyword(")",LexemeType.ClosingCurvedBracket),
 	new Keyword("<",LexemeType.OpeningAngularBracket),
 	new Keyword(">",LexemeType.ClosingAngularBracket),
-	new Keyword("[[",LexemeType.DoubleOpeningSquareBracket),
-	new Keyword("]]",LexemeType.DoubleClosingSquareBracket),
-	new Keyword("((",LexemeType.DoubleOpeningCurvedBracket),
-	new Keyword("))",LexemeType.DoubleClosingCurvedBracket),
-	new Keyword("<<",LexemeType.DoubleOpeningAngularBracket),
-	new Keyword(">>",LexemeType.DoubleClosingAngularBracket),
 	
 ]
 

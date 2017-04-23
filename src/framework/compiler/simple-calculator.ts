@@ -6,8 +6,8 @@ import * as sp from './syntax-parser';
  */
 export class SimpleCalculator {
 	static readonly ruleList = [
-		"Expr -> Expr Op Expr | $2",
-		"Op -> $4 | $5"
+		"Expr -> Expr Op Expr | $4",
+		"Op -> $6 | $7"
 	];
 
 	expression: string;
