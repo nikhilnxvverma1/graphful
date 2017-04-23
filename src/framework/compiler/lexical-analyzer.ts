@@ -28,8 +28,11 @@ export enum LexemeType{ //debugging tip: use this line number to derive the numb
 	Enumeration,//enumeration
 	OpeningMultiLineComment,// /*
 	ClosingMultiLineComment,// */
-	EOF//End of File, artificial and used exclusively by parser
-
+	EOF,//End of File, artificial and used exclusively by parser
+	ForwardSlash,// /
+	BackwardSlash,// \
+	Equals,//=
+	Backtick//`
 	//NOTE: For each addition or change, make sure to revise the string representation method below
 	
 }
@@ -64,6 +67,12 @@ export function stringForLexemeType(type:LexemeType):string{
 		case LexemeType.Enumeration:return "enumeration";
 		case LexemeType.OpeningMultiLineComment:return "/*";
 		case LexemeType.ClosingMultiLineComment:return "*/";
+		case LexemeType.OpeningCurlyBracket:return "{";
+		case LexemeType.ClosingCurlyBracket:return "{";
+		case LexemeType.ForwardSlash:return "/";
+		case LexemeType.BackwardSlash:return "\\";
+		case LexemeType.Equals:return "=";
+		case LexemeType.Backtick:return "`";
 
 		case LexemeType.EOF:return "$";//return "EOF";
 	}
@@ -153,6 +162,10 @@ var keywordList:Keyword[]=[
 	new Keyword("}",LexemeType.ClosingCurlyBracket),
 	new Keyword("<",LexemeType.OpeningAngularBracket),
 	new Keyword(">",LexemeType.ClosingAngularBracket),
+	new Keyword("/",LexemeType.ForwardSlash),
+	new Keyword("\\",LexemeType.BackwardSlash),
+	new Keyword("=",LexemeType.Equals),
+	new Keyword("`",LexemeType.Backtick),
 	
 ]
 
