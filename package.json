@@ -5,7 +5,6 @@
   "scripts": {
     "ng": "ng",
     "start": "gulp start:server",
-	"try:jison":"node practice/jison-sample.js",
     "compile:server": "gulp compile:server",
     "build:client": "ng build",
     "watch:client": "gulp watch:client",
@@ -26,7 +25,6 @@
     "bluebird": "^3.4.7",
     "core-js": "^2.4.1",
     "express": "^4.14.1",
-    "jison": "^0.4.17",
     "node-sass": "^4.5.0",
     "orientjs": "^2.2.4",
     "rxjs": "^5.0.1",
