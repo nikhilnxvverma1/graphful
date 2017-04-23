@@ -5,11 +5,10 @@ import  * as util from '../../util';
 /** Different types of syntax elements that can exists in a CFG */
 export enum SyntaxElementType{
 	NonTerminal,
-	Terminal,
-	Epsilon
+	Terminal
 }
 
-/** A single element in the CFG rule: Terminal, Non Terminal or Epsilon */
+/** A single element in the CFG rule: Terminal or Non Terminal */
 export interface SyntaxElement{
 	getType():SyntaxElementType;
 }
@@ -79,17 +78,6 @@ export class Terminal implements SyntaxElement{
 	}
 }
 
-/** Denotes an empty string */
-export class Epsilon implements SyntaxElement{
-	getType():SyntaxElementType{
-		return SyntaxElementType.Epsilon;
-	}
-
-	toString():string{
-		return "\E";
-	}
-}
-
 /** Container that holds the LHS and RHS of a CFG rule */
 export class Rule{
 	lhs:NonTerminal;
@@ -152,6 +140,7 @@ export class ContextFreeGrammer{
 			}
 		}
 
+		//after the rules are split, create each in our data structure format
 		let cfg=new ContextFreeGrammer();
 		for(let ruleString of expandedRuleString){
 			let lhsRhs = ruleString.split("->");
@@ -168,8 +157,11 @@ export class ContextFreeGrammer{
 
 				rhsPart.trim();//remove the spaces if they exist around the boundaries of the word
 
-				if(rhsPart.startsWith("$")){ //terminal following $ symbol
-					let lexemeType = Number.parseInt(rhsPart.substr(1));
+				if(rhsPart=="$E"){//stands for Epsilon
+					//For parsing purposes, an empty LHS is used 
+					console.log("Note: Single rule containing only epsilon will have an empty LHS (This is okay)");
+				}else if(rhsPart.startsWith("$")){ //must be a number following $ symbol
+					let lexemeType = Number.parseInt(rhsPart.substr(1));//exception if not a number
 					let terminal = cfg.getTerminalOrInsertIfNeeded(lexemeType);
 					newRule.rhs.push(terminal);
 				}else{
@@ -298,6 +290,11 @@ export class ContextFreeGrammer{
 		this.setRespectiveTerminalIndices(parsingResult.lexemeList);
 		var stack:ParseTreeNode[]=[];
 		stack.push(new StateParseTreeNode(0));
+
+		console.log("Lexme list:");
+		console.log(util.produceCsvOf(parsingResult.lexemeList,(item:Lexeme)=>{return ""+item.type}));
+		console.log("Terminal list:");
+		console.log(util.produceCsvOf(this.terminalList,(item:Terminal)=>{return ""+item.token}));
 
 		while(parsingResult.status==ParsingStatus.InProgress){
 			var lexeme=parsingResult.lexemeList[parsingResult.pointer];

@@ -184,7 +184,7 @@ export class ParserTable{
 						state.stateNo,
 						<NonTerminal>transition.syntaxElement,
 						transition.to.stateNo);
-				}else{//(terminal or epsilon) : shift entry
+				}else{//(terminal) : shift entry
 					this.setAction(
 						state.stateNo,
 						<Terminal>transition.syntaxElement,
@@ -357,7 +357,7 @@ class LR1Item{
 
 	/** Returns true if dot exists before a variable or terminal, false otherwise */
 	dotBeforeSyntaxElement():boolean{
-		return this.dot<this.rule.rhs.length;//TODO what about epsilon
+		return this.dot<this.rule.rhs.length;//in case of epsilon only on lhs of rule, length will be 0
 	}
 
 	toString():string{

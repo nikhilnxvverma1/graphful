@@ -22,6 +22,8 @@ export enum LexemeType{ //debugging tip: use this line number to derive the numb
 	ClosingAngularBracket,//>
 	OpeningCurvedBracket,//(
 	ClosingCurvedBracket,//)
+	OpeningCurlyBracket,//{
+	ClosingCurlyBracket,//}
 	Interface,//interface
 	Enumeration,//enumeration
 	OpeningMultiLineComment,// /*
@@ -147,6 +149,8 @@ var keywordList:Keyword[]=[
 	new Keyword("]",LexemeType.ClosingSquareBracket),
 	new Keyword("(",LexemeType.OpeningCurvedBracket),
 	new Keyword(")",LexemeType.ClosingCurvedBracket),
+	new Keyword("{",LexemeType.OpeningCurlyBracket),
+	new Keyword("}",LexemeType.ClosingCurlyBracket),
 	new Keyword("<",LexemeType.OpeningAngularBracket),
 	new Keyword(">",LexemeType.ClosingAngularBracket),
 	
