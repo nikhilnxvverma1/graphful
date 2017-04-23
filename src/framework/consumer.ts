@@ -6,7 +6,9 @@ import * as parser from './compiler/syntax-parser';
 const NODE = "Node";
 const CODEBLOCK="CodeBlock";
 const ASSIGNMENT="Assignment";
-const INVOCATION="Invocation";
+const METHOD="Method";
+const CODE="Code";
+const ARGUMENTS="Arguments"
 
 /** Spits out a bunch of graphful statements after compiling them internally */
 export class GFConsumer {
@@ -15,8 +17,13 @@ export class GFConsumer {
 	output: GFStatement[];
 	static readonly ruleList = [
 		`${NODE} -> $19 ${NODE} $20 ${CODEBLOCK}| $3 ${NODE} | $3`,
-		`${CODEBLOCK} -> $25 ${ASSIGNMENT} $26 | $E`,
-		`${ASSIGNMENT} -> $3 $34 $4 | $3 $34 $35 $3 $35`
+		`${CODEBLOCK} -> $25 ${CODE} $26 | $E`,
+		`${CODE} -> ${ASSIGNMENT} | ${METHOD}`,
+		`${CODE} -> ${ASSIGNMENT} $11 ${CODE} | ${METHOD} $11 ${CODE} `,
+		`${ASSIGNMENT} -> $3 $34 $4 | $3 $34 $35 $3 $35`,
+		`${ASSIGNMENT} -> $3 $34 ${METHOD} | $3 $34 $35 $5 $35 `,
+		`${METHOD} -> $3 $23 ${ARGUMENTS} $24`,
+		`${ARGUMENTS} ->$4 | $35 $3 $35 | $4 $11 ${ARGUMENTS} | $35 $3 $35 $11 ${ARGUMENTS} | $E`
 	];
 
 	static readonly cfg = parser.ContextFreeGrammer.grammerFrom(GFConsumer.ruleList);

@@ -179,6 +179,7 @@ export class ContextFreeGrammer{
 		}
 
 		cfg.finalizeGrammer();
+		cfg.printGrammer();
 
 		return cfg;
 	}
@@ -478,6 +479,14 @@ export class ContextFreeGrammer{
 		table.setAction(6,this.eof,ParserTableValueType.Reduce,2);
 
 		return table;
+	}
+	
+	/** Outputs each rule for debugging purposes */
+	printGrammer(){
+		console.log("Grammer:");
+		for(let rule of this.relation){
+			console.log(rule.toString());
+		}
 	}
 }
 

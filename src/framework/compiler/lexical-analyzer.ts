@@ -68,7 +68,7 @@ export function stringForLexemeType(type:LexemeType):string{
 		case LexemeType.OpeningMultiLineComment:return "/*";
 		case LexemeType.ClosingMultiLineComment:return "*/";
 		case LexemeType.OpeningCurlyBracket:return "{";
-		case LexemeType.ClosingCurlyBracket:return "{";
+		case LexemeType.ClosingCurlyBracket:return "}";
 		case LexemeType.ForwardSlash:return "/";
 		case LexemeType.BackwardSlash:return "\\";
 		case LexemeType.Equals:return "=";
