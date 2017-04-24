@@ -15,7 +15,7 @@ export class AppComponent implements OnInit{
 	ngOnInit(){
 		// this.testMathExpression();
 		// this.computeMathExpression("2-9+5-5+12");
-		this.testGraphfulExpression("[sdfg[gsfg]]{something(),another=4,yetAnother=`value`,fromMethod=method(3,`gasdf`)}");
+		this.testGraphfulExpression("[sdfg(id1-relation-id2)[gsfg]]{something(),another=4,yetAnother=`value`,fromMethod=method(3,`gasdf`)}");
 	}
 
 	testMathExpression(){
