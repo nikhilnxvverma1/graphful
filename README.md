@@ -7,13 +7,14 @@ To create any language, there are essentially two levels of development: The __f
 ## Current Status
 1. Lexical Analysis(basic version implemented)
 2. Syntax Parsing(LR(1) parser implemented)
-3. Semantic Analysis (undone)
-4. Backend framework (realized and implemented early design)
+4. Context Free Grammer of the language
+3. Semantic Analysis (Still need to translate parse tree to Graph data structure)
+4. Backend framework 
 
 ## Instructions
+Make sure you have node >= 6.9.0
 1. npm install
-2. Make sure [OrientDB server is installed and running](http://orientdb.com/docs/2.1/Tutorial-Run-the-server.html)
-3. npm run build:client
-4. npm run compile:server
-5. npm start
-6. npm run watch:client (in a separate window)
+2. npm run build:client
+3. npm run compile:server
+4. npm start
+5. npm run watch:client (in a separate window)
