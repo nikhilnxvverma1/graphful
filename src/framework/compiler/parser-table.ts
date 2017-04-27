@@ -287,7 +287,7 @@ export class ParserTable{
 }
 
 /** An LR(1) item is a combination of rule, position of cursor(dot) and lookahead symbols */
-class LR1Item{
+export class LR1Item{
 
 	rule:Rule;
 	/** Denotes cursor position which is specified by index in the rule's RHS.*/
@@ -375,7 +375,7 @@ class LR1Item{
 }
 
 /** A collection of LR(1) item set along with transitions to other states */
-class ParsingState{
+export class ParsingState{
 	stateNo:number;
 	itemList:LR1Item[]=[];
 	transitions:ParsingTransition[]=[];
@@ -577,7 +577,7 @@ class ParsingState{
 }
 
 /** Denotes transition from one parsing state to another for a given syntax element */
-class ParsingTransition{
+export class ParsingTransition{
 	syntaxElement:SyntaxElement;
 	from:ParsingState;
 	to:ParsingState;

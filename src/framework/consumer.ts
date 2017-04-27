@@ -17,7 +17,7 @@ export class GFConsumer {
 	input: string;
 	output: GFStatement[];
 	static readonly ruleList = [
-		`${NODE} -> $19 $20 `
+		`${NODE} -> $19 ${NODE} $20 | $E`
 	];
 	// static readonly ruleList = [
 	// 	`${NODE} -> $19 ${NODE} $20 ${CODEBLOCK}| $3 ${EDGEBLOCK} ${NODE} | $3 ${EDGEBLOCK}`,
