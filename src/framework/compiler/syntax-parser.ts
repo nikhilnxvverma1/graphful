@@ -151,7 +151,7 @@ export class ContextFreeGrammer{
 			newRule.lhs=cfg.getNonTerminalOrInsertIfNeeded(lhs);
 			newRule.rhs=[];
 			//break the rhs into individual parts
-			let rhsParts = rhs.split(" ");
+			let rhsParts = rhs.split(/\s+/);
 			
 			for(let rhsPart of rhsParts){
 
