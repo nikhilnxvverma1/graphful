@@ -159,7 +159,7 @@ export class ContextFreeGrammer{
 
 				if(rhsPart=="$E"){//stands for Epsilon
 					//For parsing purposes, an empty LHS is used 
-					console.log("Note: Single rule containing only epsilon will have an empty LHS (This is okay)");
+					// console.log("Note: Single rule containing only epsilon will have an empty LHS (This is okay)");
 				}else if(rhsPart.startsWith("$")){ //must be a number following $ symbol
 					let lexemeType = Number.parseInt(rhsPart.substr(1));//exception if not a number
 					let terminal = cfg.getTerminalOrInsertIfNeeded(lexemeType);
@@ -179,7 +179,7 @@ export class ContextFreeGrammer{
 		}
 
 		cfg.finalizeGrammer();
-		cfg.printGrammer();
+		// cfg.printGrammer();
 
 		return cfg;
 	}
@@ -292,10 +292,10 @@ export class ContextFreeGrammer{
 		var stack:ParseTreeNode[]=[];
 		stack.push(new StateParseTreeNode(0));
 
-		console.log("Lexme list:");
-		console.log(util.produceCsvOf(parsingResult.lexemeList,(item:Lexeme)=>{return ""+item.type}));
-		console.log("Terminal list:");
-		console.log(util.produceCsvOf(this.terminalList,(item:Terminal)=>{return ""+item.token}));
+		// console.log("Lexme list:");
+		// console.log(util.produceCsvOf(parsingResult.lexemeList,(item:Lexeme)=>{return ""+item.type}));
+		// console.log("Terminal list:");
+		// console.log(util.produceCsvOf(this.terminalList,(item:Terminal)=>{return ""+item.token}));
 
 		while(parsingResult.status==ParsingStatus.InProgress){
 			var lexeme=parsingResult.lexemeList[parsingResult.pointer];

@@ -152,9 +152,9 @@ export class ParserTable{
 		this.fillTableUsing(processedStates);
 
 		//output
-		util.printList(processedStates);//only states
-		this.printStateDiagram(processedStates);
-		this.printParsingTable();
+		// util.printList(processedStates);//only states
+		// this.printStateDiagram(processedStates);
+		// this.printParsingTable();
 	}
 
 

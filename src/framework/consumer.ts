@@ -39,7 +39,7 @@ export class GFConsumer {
 
 	compile(): boolean {
 		let parsingResult = GFConsumer.cfg.parse(this.input);
-		console.log(parsingResult);
+		// console.log(parsingResult);
 		if (parsingResult.status == parser.ParsingStatus.Passed) {
 			return true;
 		}
