@@ -18,11 +18,11 @@ const STRING = "String";
 const ARRAY = "Array";
 const EDGE = "Edge";
 
-/** Spits out a bunch of graphful statements after compiling them internally */
+/** Converts graphful code into a graph data structure */
 export class GFConsumer {
 
 	input: string;
-	output: GFGraph[];
+	output: GFGraph;
 	static readonly ruleList = [
 		`${NODE_LIST} -> ${NODE} ${NODE_LIST} | ${NODE}`,
 		`${NODE} -> $3 ${TYPE} ${BLOCK} $36`,
