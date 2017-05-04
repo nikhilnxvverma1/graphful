@@ -33,7 +33,8 @@ export enum LexemeType{ //debugging tip: use this line number to derive the numb
 	BackwardSlash,// \
 	Equals,//=
 	Backtick,//`
-	SemiColon//;
+	SemiColon,//;
+	Dot//.
 	//NOTE: For each addition or change, make sure to revise the string representation method below
 	
 }
@@ -75,6 +76,7 @@ export function stringForLexemeType(type:LexemeType):string{
 		case LexemeType.Equals:return "=";
 		case LexemeType.Backtick:return "`";
 		case LexemeType.SemiColon:return ";";
+		case LexemeType.Dot:return ".";
 
 		case LexemeType.EOF:return "$";//return "EOF";
 	}
@@ -169,6 +171,7 @@ var keywordList:Keyword[]=[
 	new Keyword("=",LexemeType.Equals),
 	new Keyword("`",LexemeType.Backtick),
 	new Keyword(";",LexemeType.SemiColon),
+	new Keyword(".",LexemeType.Dot),
 ]
 
 //sort the keyword list in descending order because
