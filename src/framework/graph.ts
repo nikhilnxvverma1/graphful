@@ -2,8 +2,8 @@ import { GFNode } from './node';
 import { GFEdge } from './edge';
 
 export class GFGraph{
-	nodeList:GFNode[];
-	edgeList:GFEdge[];
+	nodeList:GFNode[]=[];
+	edgeList:GFEdge[]=[];
 
 	//methods for filtering nodes based on a selector
 

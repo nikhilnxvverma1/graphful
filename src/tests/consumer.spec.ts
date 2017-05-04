@@ -1,5 +1,5 @@
 import { ParserTable } from 'framework/compiler/parser-table';
-import { ContextFreeGrammer } from 'framework/compiler/syntax-parser';
+import { ContextFreeGrammer,ParentParseTreeNode,LeafParseTreeNode } from 'framework/compiler/syntax-parser';
 import { GFConsumer } from 'framework/consumer';
 import { GFGraph } from 'framework/graph';
 import { GFNode } from 'framework/node';
@@ -82,3 +82,5 @@ describe('Graphful', () => {
 	});
 
 });
+
+

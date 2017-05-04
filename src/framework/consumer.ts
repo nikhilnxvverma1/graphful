@@ -1,7 +1,8 @@
 import { GFStatement } from './statement';
 import * as lexer from './compiler/lexical-analyzer';
-import { ParsingResult, ParsingStatus, ContextFreeGrammer } from './compiler/syntax-parser';
+import { ParsingResult, ParsingStatus, ContextFreeGrammer,ParentParseTreeNode,LeafParseTreeNode } from './compiler/syntax-parser';
 import { GFGraph } from './graph';
+import { GFNode } from './node';
 
 //Non Terminals
 const NODE_LIST = "Statement";
@@ -23,6 +24,7 @@ export class GFConsumer {
 
 	input: string;
 	output: GFGraph;
+	parsingResult:ParsingResult;
 	static readonly ruleList = [
 		`${NODE_LIST} -> ${NODE} ${NODE_LIST} | ${NODE}`,
 		`${NODE} -> $3 ${TYPE} ${BLOCK} $36`,
@@ -47,16 +49,36 @@ export class GFConsumer {
 	}
 
 	compile(): boolean {
-		let parsingResult = GFConsumer.cfg.parse(this.input);
-		if (parsingResult.status != ParsingStatus.Passed) {
+		this.parsingResult = GFConsumer.cfg.parse(this.input);
+		if (this.parsingResult.status != ParsingStatus.Passed) {
 			return false;
 		}
-		this.convertParseTreeToGraph(parsingResult);
+		this.output=new GFGraph();
+		this.extractNodesFrom(this.parsingResult.root,this.input,this.output);
 		return true;
 	}
 
-	private convertParseTreeToGraph(parsingResult: ParsingResult) {
-		let root=parsingResult.root;
+	private extractNodesFrom(nodeListContainer:ParentParseTreeNode,input:string,graph:GFGraph) {
+		//each child of the node container corresponds to a node in graph
+		for(let child of nodeListContainer.children){
+			//create a node from this child
+			let node=new GFNode();
+			this.getSimpleNodeInfo(<ParentParseTreeNode>child,input,node);
+			graph.nodeList.push(node);
+		}
+	}
+
+	private getSimpleNodeInfo(nodeContainer:ParentParseTreeNode,input:string,node:GFNode){
+
+		//retrieve id from first child
+		let id=nodeContainer.children[0].getLexeme().valueIn(input);
+		node.id=id;
+		
+		//retrieve possible type from second child
+		let typeContainer=<ParentParseTreeNode>nodeContainer.children[1];
+		if(typeContainer.children.length==3){
+			node.type=typeContainer.children[1].getLexeme().valueIn(input);
+		}
 	}
 
 }

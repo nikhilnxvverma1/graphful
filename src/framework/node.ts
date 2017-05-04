@@ -3,10 +3,7 @@ import { GFEdge } from './edge';
 export class GFNode{
 	id:string;
 	type:string;
-	content:string[];
-	parent:GFNode;
 	edgeList:GFEdge[];
-	private code;
 
 	getConnectedNodes(edgeName:string):GFNode[]{
 		let connectedNodes:GFNode[]=[];
