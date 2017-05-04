@@ -298,7 +298,15 @@ export class ContextFreeGrammer{
 		// console.log(util.produceCsvOf(this.terminalList,(item:Terminal)=>{return ""+item.token}));
 
 		while(parsingResult.status==ParsingStatus.InProgress){
+
 			var lexeme=parsingResult.lexemeList[parsingResult.pointer];
+
+			//if lexeme is not part of grammer, then fail
+			if(lexeme.terminalIndex==null){
+				parsingResult.errorMessage="Invalid symbol: "+stringForLexemeType(lexeme.type);
+				parsingResult.status=ParsingStatus.Failed;
+				break;
+			}
 			var terminal=this.terminalList[lexeme.terminalIndex];
 			
 			//get the state from whatever is on top of stack
@@ -508,6 +516,8 @@ export class ParsingResult{
 	pointer:number;
 	/** List of lexemes created from the raw input */
 	lexemeList:Lexeme[];
+	/** User friendly message to display for all the syntax errors */
+	errorMessage:string;
 
 	constructor(input:string){
 		this.input=input;

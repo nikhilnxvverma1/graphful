@@ -34,22 +34,22 @@ describe('Terminal', () => {
 
 });
 
-describe('ContextFreeGrammer Generation', () => {
+describe('ContextFreeGrammer generation for 5 rules', () => {
 	let cfg:ContextFreeGrammer;
 	let expectedNonTerminals;
 	let expectedTerminals;
 	let expectedRules;
 
-	beforeEach(() => {
-		const ruleList = [
-			"Expr -> Expr Op Expr | $4",
-			"Op -> $6 | $7"
-		];
-		cfg=ContextFreeGrammer.grammerFrom(ruleList);
-		expectedNonTerminals=2+1;//1 for the augumented rule
-		expectedTerminals=3;
-		expectedRules=4+1;//1 for augumented rule
-	});
+	const ruleList = [
+		"Expr -> Expr Op Expr | $4",
+		"Op -> $6 | $7"
+	];
+	cfg=ContextFreeGrammer.grammerFrom(ruleList);
+	expectedNonTerminals=2+1;//1 for the augumented rule
+	expectedTerminals=3+1;//1 for eof
+	expectedRules=4+1;//1 for augumented rule
+	// beforeEach(() => {
+	// });
 
 	it('should start with an augumented rule',()=>{
 		expect(cfg.start.isAugumentedVariable()).toBeTruthy();
@@ -60,7 +60,7 @@ describe('ContextFreeGrammer Generation', () => {
 	});
 
 	it('should contain all the terminals',()=>{
-		expect(cfg.variableList.length).toBe(expectedTerminals);
+		expect(cfg.terminalList.length).toBe(expectedTerminals);
 	});
 
 	it('should contain all the rules',()=>{
@@ -101,5 +101,63 @@ describe('ContextFreeGrammer Generation', () => {
 		expect((cfg.relation[4].rhs[0] as Terminal).token).toBe(7);
 		
 		
+	});
+
+
+});
+
+describe('ContextFreeGrammer : Node -> id', () => {
+
+	let cfg:ContextFreeGrammer;
+	let expectedNonTerminals;
+	let expectedTerminals;
+	let expectedRules;
+
+	const ruleList = [
+		"Node -> $3"
+	];
+	cfg=ContextFreeGrammer.grammerFrom(ruleList);
+	expectedNonTerminals=1+1;//1 for the augumented rule
+	expectedTerminals=1+1;//1 for eof
+	expectedRules=1+1;//1 for augumented rule
+
+	describe('Construction and parser table', () => {
+		it('should start with an augumented rule',()=>{
+				expect(cfg.start.isAugumentedVariable()).toBeTruthy();
+			});
+
+			it('should contain all the non terminals',()=>{
+				expect(cfg.variableList.length).toBe(expectedNonTerminals);
+			});
+
+			it('should contain all the terminals',()=>{
+				expect(cfg.terminalList.length).toBe(expectedTerminals);
+			});
+
+			it('should contain all the rules',()=>{
+				expect(cfg.relation.length).toBe(expectedRules);
+			});
+
+			it('should have correct LHS in all the rules',()=>{
+				expect(cfg.relation[0].lhs.isAugumentedVariable()).toBeTruthy();
+				expect(cfg.relation[1].lhs.representation).toEqual("Node");
+			});
+
+			it('should have correct RHS in all the rules',()=>{
+				//augumented
+				expect(cfg.relation[0].rhs[0].getType()).toBe(SyntaxElementType.NonTerminal);
+				expect((cfg.relation[0].rhs[0] as NonTerminal).representation).toBe("Node");
+
+				//Node -> identifier
+				expect(cfg.relation[1].rhs[0].getType()).toBe(SyntaxElementType.Terminal);
+				expect((cfg.relation[1].rhs[0] as Terminal).token).toBe(3);
+				
+			});
+	});
+
+	describe('Parsing input', () => {
+		it('should parse simple asdf3',()=>{
+			expect(cfg.parse("asdf3")).toBeTruthy();
+		});
 	});
 });

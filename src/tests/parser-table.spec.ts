@@ -6,7 +6,4 @@ describe('Parser table', () => {
 		
 	});
 
-	it('should add to 2',()=>{//sample
-		expect(1+1).toEqual(2);
-	});
 });

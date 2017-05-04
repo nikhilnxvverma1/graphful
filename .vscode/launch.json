@@ -17,9 +17,12 @@
 		{
 			"type": "node",
 			"request": "launch",
-			"name": "Jison Sample",
+			"name": "Test Program",//useless
 			"cwd": "${workspaceRoot}",
-			"program": "${workspaceRoot}/practice/jison-sample.js"
+			"program": "${workspaceRoot}/server/index.ts",
+			"preLaunchTask": "compile:server",
+			"sourceMaps": true,
+			"outFiles": []
 		},
 		{
 			"type": "node",
