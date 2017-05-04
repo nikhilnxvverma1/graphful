@@ -218,6 +218,13 @@ export function getLexemeList(input: string): Lexeme[] {
 			continue;//this lexeme has been found, so move on to the next one
 		}
 
+		//skip through any whitespace(including tabs) or newlines 
+		let char=input.charAt(i);
+		if(char ==' ' || char == '\n' || char == '\t'){
+			i++;
+			continue;
+		}
+
 		//check for match with any keyword
 		//this is an O(1) operation since the keyword list is finitely defined
 		//in other words, think of this as multiple if else statements
@@ -225,7 +232,7 @@ export function getLexemeList(input: string): Lexeme[] {
 		for (let keyword of keywordList) {
 
 			//if there is a match, store the result, and break from this inner loop
-			let keywordMatch = keyword.lexemeMatch(input, i);
+			keywordMatch = keyword.lexemeMatch(input, i);
 			if (keywordMatch != null) {
 				break;
 			}

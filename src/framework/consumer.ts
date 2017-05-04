@@ -33,7 +33,7 @@ export class GFConsumer {
 		`${VALUE} -> ${INTEGER} | ${FLOAT} | ${STRING} | ${EDGE} | ${ARRAY}`,
 		`${INTEGER} -> $4`,
 		`${FLOAT} -> $4 $37 $4`,
-		`${STRING} -> $35 $3 $35`, //TODO change to support string on lexical stage
+		`${STRING} -> $38`,
 		`${EDGE} -> $23 $3 $24`,
 		`${ARRAY} -> $19 ${VALUE_LIST} $20`,
 		`${VALUE_LIST} -> ${VALUE} $11 ${VALUE_LIST} | ${VALUE} | $E`,
