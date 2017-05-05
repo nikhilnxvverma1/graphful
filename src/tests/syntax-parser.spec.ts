@@ -103,6 +103,11 @@ describe('ContextFreeGrammer generation for 5 rules', () => {
 		
 	});
 
+	it("should identify shift reduce conflicts",()=>{
+		expect(cfg.hasShiftReduceConflicts()).toBeTruthy();
+	});
+
+
 
 });
 

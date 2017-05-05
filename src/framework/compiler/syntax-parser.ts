@@ -498,6 +498,11 @@ export class ContextFreeGrammer{
 			console.log(rule.toString());
 		}
 	}
+
+	/** Tells weather this CFG has shift reduce conflicts or not */
+	public hasShiftReduceConflicts():boolean{
+		return this.parserTable.shiftReduceConflicts.length>0;
+	}
 }
 
 export enum ParsingStatus{

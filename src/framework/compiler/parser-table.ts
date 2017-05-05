@@ -33,11 +33,22 @@ export class ParserTableValue{
 	}
 }
 
+export class ShiftReduceConflict{
+	state:number;
+	terminal:Terminal;
+	constructor(state:number,terminal:Terminal){
+		this.state=state;
+		this.terminal=terminal;
+	}
+}
+
 /** Holds a 2d table that drives the shift reduce algorithm. */
 export class ParserTable{
 	private cfg:ContextFreeGrammer;
 	private table:ParserTableValue[][]=[];
 	private rowCount=0;
+
+	shiftReduceConflicts:ShiftReduceConflict[]=[];
 
 	constructor(cfg:ContextFreeGrammer){
 		this.cfg=cfg;
@@ -204,8 +215,13 @@ export class ParserTable{
 						ParserTableValueType.Accept,
 						-1);
 				}else{//reduce entry
+
 					//only under the lookahead symbols
 					for(let lookahead of item.lookaheads){
+						if(this.getAction(state.stateNo,lookahead).type==ParserTableValueType.Shift){
+							// console.error("Shift Reduce Conflict arisen at ("+state.stateNo+","+lookahead.token+")");
+							this.shiftReduceConflicts.push(new ShiftReduceConflict(state.stateNo,lookahead));
+						}
 						this.setAction(
 							state.stateNo,
 							lookahead,
