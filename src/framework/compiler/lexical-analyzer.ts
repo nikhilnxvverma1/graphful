@@ -112,7 +112,20 @@ export class Lexeme {
 	}
 
 	valueIn(input: string): string {
-		return input.substr(this.start, this.length);
+
+		//special case: remove the outer qutation marks
+		if(this.type==LexemeType.Literal){
+
+			//ending also with literal mark
+			if(litrealMarkFor(input.charAt(this.start+this.length-1))!=LiteralMark.None){
+				return input.substr(this.start+1, this.length-2);
+			}else{
+				return input.substr(this.start+1, this.length-1);
+			}
+
+		}else{
+			return input.substr(this.start, this.length);;
+		}
 	}
 }
 

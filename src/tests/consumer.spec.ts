@@ -76,7 +76,16 @@ describe('Graphful', () => {
 			consumer.compile();
 			let node=consumer.output.nodeList[0];
 			expect(node.id).toBe("node1");
-			//TODO test if attributes match
+
+			//test if attributes match
+			expect(node.attributes[0].name).toBe("foo");
+			expect(node.attributes[0].object.value).toBe(23);
+
+			expect(node.attributes[1].name).toBe("bar");
+			expect(node.attributes[1].object.value).toBe("asfga");
+
+			expect(node.attributes[2].name).toBe("baz");
+			expect(node.attributes[2].object.value).toBe(2.3);
 		});
 
 	});

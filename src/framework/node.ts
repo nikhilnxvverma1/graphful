@@ -1,9 +1,11 @@
 import { GFEdge } from './edge';
+import { GFAttribute } from './attribute';
 
 export class GFNode{
 	id:string;
 	type:string;
 	edgeList:GFEdge[];
+	attributes:GFAttribute[]=[];
 
 	getConnectedNodes(edgeName:string):GFNode[]{
 		let connectedNodes:GFNode[]=[];
