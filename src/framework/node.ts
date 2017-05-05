@@ -6,6 +6,8 @@ export class GFNode{
 	type:string;
 	edgeList:GFEdge[];
 	attributes:GFAttribute[]=[];
+	/** Placeholder nodes are used by edges that don't have actual nodes prepared up yet */
+	placeholder=false;
 
 	getConnectedNodes(edgeName:string):GFNode[]{
 		let connectedNodes:GFNode[]=[];

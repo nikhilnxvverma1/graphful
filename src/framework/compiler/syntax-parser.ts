@@ -234,7 +234,9 @@ export class ContextFreeGrammer{
 		for(let rule of this.relation){
 			if(rule.lhs==variable){
 				var element=rule.rhs[0];
-				if(element.getType()==SyntaxElementType.NonTerminal &&
+				if(element==null){//possible if the rhs contains Epsilon
+					continue;
+				}else if(element.getType()==SyntaxElementType.NonTerminal &&
 					element!=variable && recursive){
 
 					//for a new non terminal recursively find and add its first element

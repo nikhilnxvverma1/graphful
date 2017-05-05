@@ -7,11 +7,17 @@ export class GFGraph{
 
 	//methods for filtering nodes based on a selector
 
-	getNodeById(id:string):GFNode{
+	getNodeById(id:string,makeIfNeeded=false):GFNode{
 		for(let i=0;i<this.nodeList.length;i++){
 			if(this.nodeList[i].id==id){
 				return this.nodeList[i];
 			}
+		}
+		if(makeIfNeeded){
+			let node=new GFNode();
+			node.id=id;
+			node.placeholder=true;
+			return node;
 		}
 		return null;
 	}

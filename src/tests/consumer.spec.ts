@@ -18,6 +18,11 @@ describe('Graphful', () => {
 			expect(consumer.compile()).toBeTruthy();
 		});
 
+		it('should successfully parse 2 nodes: node1<MyType>{};node2<SomeOtherType>{};',()=>{
+			let consumer=new GFConsumer("node1<MyType>{};node2<SomeOtherType>{};");
+			expect(consumer.compile()).toBeTruthy();
+		});
+
 		it('should successfully parse 1 attributes of int: node1{foo=23};',()=>{
 			let consumer=new GFConsumer("node1{foo=23};");
 			expect(consumer.compile()).toBeTruthy();
@@ -59,14 +64,14 @@ describe('Graphful', () => {
 		it('should yield single node for node1{};',()=>{
 			let consumer=new GFConsumer("node1{};");
 			consumer.compile();
-			let node=consumer.output.nodeList[0];
+			let node=consumer.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 		});
 
 		it('should yield single node for node1<MyType>{};',()=>{
 			let consumer=new GFConsumer("node1<MyType>{};");
 			consumer.compile();
-			let node=consumer.output.nodeList[0];
+			let node=consumer.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 			expect(node.type).toBe("MyType");
 		});
@@ -74,7 +79,7 @@ describe('Graphful', () => {
 		it('should yield node with correct attributes for int, string and float: node1{foo=23,bar=`asfga`,baz=2.3,};',()=>{
 			let consumer=new GFConsumer("node1{foo=23,bar=`asfga`,baz=2.3};");
 			consumer.compile();
-			let node=consumer.output.nodeList[0];
+			let node=consumer.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 
 			//test if attributes match
@@ -86,6 +91,23 @@ describe('Graphful', () => {
 
 			expect(node.attributes[2].name).toBe("baz");
 			expect(node.attributes[2].object.value).toBe(2.3);
+		});
+
+		it('should yield 2 nodes connected via edge for node1<MyType>{foo=(node2)}; node2{}',()=>{
+			let consumer=new GFConsumer("node1<MyType>{foo=(node2)}; node2{};");
+			let syntaxOk=consumer.compile();
+
+			expect(syntaxOk).toBeTruthy();
+
+			let node1=consumer.graph.nodeList[0];
+			expect(node1.id).toBe("node1");
+			expect(node1.type).toBe("MyType");
+
+			let node2=consumer.graph.nodeList[1];
+			expect(node2.id).toBe("node2");
+			
+			expect(node1.edgeList[0].name).toBe("foo");
+			expect(node1.edgeList[0].node2).toBe(node2);
 		});
 
 	});
