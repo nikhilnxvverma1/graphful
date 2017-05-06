@@ -105,6 +105,8 @@ export class Rule{
  * For the sake of reliable parsing results unambigous grammer should be supplied.
  */
 export class ContextFreeGrammer{
+	/** Optional name for display purposes only. (Useful while debugging) */
+	displayName?:string;
 	variableList:NonTerminal[]=[];
 	terminalList:Terminal[]=[];
 	relation:Rule[]=[];
@@ -116,7 +118,7 @@ export class ContextFreeGrammer{
 	private parserTable:ParserTable;
 
 	/** Generates CFG data structure from a space sepearated list of rule .strings. NO error checking */
-	static grammerFrom(ruleStringList:string[]):ContextFreeGrammer{
+	static grammerFrom(ruleStringList:string[],displayName?:string):ContextFreeGrammer{
 
 		//break multiple rules into simpler smaller parts
 		let expandedRuleString:string[]=[];
@@ -142,6 +144,7 @@ export class ContextFreeGrammer{
 
 		//after the rules are split, create each in our data structure format
 		let cfg=new ContextFreeGrammer();
+		cfg.displayName=displayName;
 		for(let ruleString of expandedRuleString){
 			let lhsRhs = ruleString.split("->");
 			let lhs = lhsRhs[0].trim();

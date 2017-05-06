@@ -29,7 +29,7 @@ export class GFConsumer {
 	graph: GFGraph;
 	parsingResult: ParsingResult;
 	static readonly ruleList = [
-		`${NODE_LIST} -> ${NODE} ${NODE_LIST} | $E`,
+		`${NODE_LIST} -> ${NODE} ${NODE_LIST} | ${NODE}`,
 		`${NODE} -> $3 ${TYPE} ${BLOCK} $36`,
 		`${TYPE} -> $21 $3 $22 | $E`,
 		`${BLOCK} -> $25 ${ATTRIBUTE_LIST} $26`,
