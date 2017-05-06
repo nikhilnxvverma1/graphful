@@ -166,6 +166,9 @@ export class ParserTable{
 		// util.printList(processedStates);//only states
 		// this.printStateDiagram(processedStates);
 		// this.printParsingTable();
+		let graphviz=this.generateGraphViz(processedStates);
+		console.log("Graphviz:");
+		console.log(graphviz);
 	}
 
 
@@ -299,6 +302,34 @@ export class ParserTable{
 			}
 		}
 		return null;
+	}
+
+	generateGraphViz(states:ParsingState[]):string{
+		let graphviz=`
+			digraph state_machine {
+			rankdir=LR;
+			node [shape = rectangle];
+			`;
+
+		for(let state of states){
+			
+			graphviz+=`${state.stateNo}`;
+			graphviz+=`[label="${state.stateNo}\\n`;
+			for(let item of state.itemList){
+				graphviz+=item.toString()+"\\n";
+			}
+			graphviz+=`"];`;
+	
+		}
+		for(let state of states){
+			for(let transition of state.transitions){
+				graphviz+=`${state.stateNo} -> ${transition.to.stateNo} [label = "${transition.syntaxElement.toString()}"];`;
+			}
+		}
+		
+		graphviz+=`}`;
+
+		return graphviz;
 	}
 }
 
