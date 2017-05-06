@@ -19,11 +19,19 @@
 			"request": "launch",
 			"name": "Test Program",//useless
 			"cwd": "${workspaceRoot}",
-			"program": "${workspaceRoot}/server/index.ts",
-			"preLaunchTask": "compile:server",
+			"program": "/usr/local/bin/ng",
+			"args": ["test"],
 			"sourceMaps": true,
 			"outFiles": []
 		},
+		 {
+            "type": "chrome",
+            "request": "attach",
+            "name": "Attach to Karma tests",
+            "port": 9222,
+            "url": "localhost:9876/",
+            "webRoot": "${workspaceRoot}"
+        },
 		{
 			"type": "node",
 			"request": "attach",
