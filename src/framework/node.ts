@@ -4,11 +4,8 @@ import { GFAttribute } from './attribute';
 export class GFNode{
 	id:string;
 	type:string;
-	edgeList:GFEdge[]=[];
+	edgeList:GFEdge[];
 	attributes:GFAttribute[]=[];
-	attributeEdges:GFEdge[]=[];
-	/** Optional primitive value. Useful incase of attribute nodes */
-	value:any;
 	/** Placeholder nodes are used by edges that don't have actual nodes prepared up yet */
 	placeholder=false;
 

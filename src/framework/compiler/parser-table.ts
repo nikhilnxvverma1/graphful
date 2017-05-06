@@ -152,7 +152,6 @@ export class ParserTable{
 						//to closure being done from the opposite direction
 						unprocessedStates.unshift(outgoing.to);
 					}
-					// unprocessedStates.unshift(outgoing.to);
 				}
 			}
 
@@ -166,10 +165,10 @@ export class ParserTable{
 		//output
 		// util.printList(processedStates);//only states
 		// this.printStateDiagram(processedStates);
+		// this.printParsingTable();
 		let graphviz=this.generateGraphViz(processedStates);
-		console.log(`Graphviz(${this.cfg.displayName}):`);
+		console.log("Graphviz:");
 		console.log(graphviz);
-		this.printParsingTable();
 	}
 
 
@@ -433,7 +432,6 @@ export class ParsingState{
 	constructor(itemList:LR1Item[],cfg:ContextFreeGrammer){
 		this.itemList=itemList;
 		this.findClosure(cfg);
-		// console.log("Found closure");
 	}
 
 	/** In finding the closure, it computes new lookahead symbols */
@@ -557,6 +555,7 @@ export class ParsingState{
 				//for each variable rule, 
 				for(let variableRule of variableRules){
 
+
 					//make an LR(1) item with dot placed at the beginning,
 					var derived=new LR1Item(variableRule,0);
 
@@ -569,8 +568,7 @@ export class ParsingState{
 						if(followingAfterDot.getType()==SyntaxElementType.NonTerminal){
 							//find first and store in a list
 							var firstTerminals:Terminal[]=[];
-							// cfg.first(<NonTerminal>followingAfterDot,firstTerminals,false);//we intentionally don't find first recursively
-							cfg.first(<NonTerminal>followingAfterDot,firstTerminals,true);//finds lookaheads if they are further deeper inside another non terminal
+							cfg.first(<NonTerminal>followingAfterDot,firstTerminals,false);//we intentionally don't find first recursively
 
 							//if the first list is empty, 
 							if(firstTerminals.length==0){
@@ -595,27 +593,15 @@ export class ParsingState{
 					//set the lookaheads for the derived items 
 					derived.lookaheads=derivedsLookaheads;
 
-					this.itemList.push(derived);
-					
-					//add this item to the set only if current item's LHS has not been analyzed yet
-					if(!this.containsItemWith(<NonTerminal>afterDot)){
+					//add this item to the set only if it is unique
+					if(!this.contains(derived)){
+						this.itemList.push(derived);
 						//and find its closure recursively
 						this.closure(derived,cfg);
 					}
-				
 				}
 			}
 		}
-		// console.log(`Finished finding closure for ${item.toString()}`);
-	}
-
-	private containsItemWith(lhs:NonTerminal):boolean{
-		for(let item of this.itemList){
-			if(item.rule.lhs==lhs){
-				return true;
-			}
-		}
-		return false;
 	}
 
 	contains(possible:LR1Item):boolean{

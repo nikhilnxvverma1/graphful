@@ -34,7 +34,7 @@ describe('Terminal', () => {
 
 });
 
-xdescribe('ContextFreeGrammer generation for 5 rules', () => {
+describe('ContextFreeGrammer generation for 5 rules', () => {
 	let cfg:ContextFreeGrammer;
 	let expectedNonTerminals;
 	let expectedTerminals;
@@ -111,7 +111,7 @@ xdescribe('ContextFreeGrammer generation for 5 rules', () => {
 
 });
 
-xdescribe('ContextFreeGrammer : Node -> id', () => {
+describe('ContextFreeGrammer : Node -> id', () => {
 
 	let cfg:ContextFreeGrammer;
 	let expectedNonTerminals;

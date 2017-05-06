@@ -5,7 +5,7 @@ export class GFEdge implements GFObject{
 	name:string;
 	node1:GFNode;
 	node2:GFNode;
-	directed:boolean;//TODO change this
+	directed:boolean;
 	
 	value:GFEdge;
 

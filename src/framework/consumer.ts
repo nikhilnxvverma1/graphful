@@ -45,8 +45,7 @@ export class GFConsumer {
 
 	];
 
-	// static readonly cfg = ContextFreeGrammer.grammerFrom(GFConsumer.ruleList);
-	static readonly cfg ;
+	static readonly cfg = ContextFreeGrammer.grammerFrom(GFConsumer.ruleList);
 
 	constructor(input: string) {
 		this.input = input;
