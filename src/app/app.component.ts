@@ -17,6 +17,7 @@ export class AppComponent implements OnInit{
 		// this.computeMathExpression("2-9+5-5+12");
 		// this.testGraphfulExpression("[sdfg(id1-relation-id2)[gsfg]]{something(),another=4,yetAnother=`value`,fromMethod=method(3,`gasdf`)}");
 		// this.testGraphfulExpression("[[]]");
+		this.testTutorialGrammerMiftaSintaha();
 	}
 
 	testMathExpression(){
@@ -58,5 +59,30 @@ export class AppComponent implements OnInit{
 		}else{
 			console.log("grammer failed");
 		}
+	}
+
+	testTutorialGrammerSamyaDaleh(){
+			let ruleList=[
+			`S -> B C | D A`,
+			`B -> $7`,
+			`C -> A A`,
+			`A -> $6`,
+			`D -> $7 $6`
+
+		]
+		let cfg=sp.ContextFreeGrammer.grammerFrom(ruleList,"Samya Daleh");
+		let parsingResult=cfg.parse("baabaa");
+		console.log("Passed:"+(parsingResult.status==sp.ParsingStatus.Passed));
+	}
+
+	testTutorialGrammerMiftaSintaha(){
+			let ruleList=[
+			`S -> X X`,
+			`X -> $6 X`,
+			`X -> $7`,
+		]
+		let cfg=sp.ContextFreeGrammer.grammerFrom(ruleList,"Mifta Sintaha");
+		let parsingResult=cfg.parse("-+--+");
+		console.log("Passed:"+(parsingResult.status==sp.ParsingStatus.Passed));
 	}
 }

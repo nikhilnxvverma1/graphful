@@ -5,7 +5,7 @@ import { GFGraph } from 'framework/graph';
 import { GFNode } from 'framework/node';
 import { GFEdge } from 'framework/edge';
 
-describe('Graphful', () => {
+xdescribe('Graphful', () => {
 
 	describe('Syntax parsing', () => {
 		it('should successfully parse single node: node1{};',()=>{
