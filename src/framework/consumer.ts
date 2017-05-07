@@ -22,6 +22,12 @@ const STRING = "String";
 const ARRAY = "Array";
 const EDGE = "Edge";
 
+
+const INTEGER_TYPE = "Integer";
+const FLOAT_TYPE = "Float";
+const STRING_TYPE = "String";
+const ARRAY_TYPE = "Array";
+
 /** Converts graphful code into a graph data structure */
 export class GFConsumer {
 
@@ -57,19 +63,26 @@ export class GFConsumer {
 			return false;
 		}
 		this.graph = new GFGraph();
-		// this.extractGraphFrom(this.parsingResult.root);
+		this.extractNodesFrom(this.parsingResult.root);
 		return true;
 	}
 
-	private extractGraphFrom(nodeListContainer: ParentParseTreeNode) {
+	private extractNodesFrom(nodeListContainer: ParentParseTreeNode) {
 		let pairs: ContainerNodePair[] = [];
 		//each child of the node container corresponds to a node in graph
 		for (let child of nodeListContainer.children) {
-			//find a node from this child container
-			let nodeContainer = <ParentParseTreeNode>child;
-			let node = this.makeSimpleNode(nodeContainer);
-			this.graph.nodeList.push(node);
-			pairs.push(new ContainerNodePair(nodeContainer, node));
+
+			//child will always be a container: Node or NodeList
+			let container = <ParentParseTreeNode>child;
+			if (container.getNonTerminal().representation == NODE) {//NODE
+
+				let node = this.makeSimpleNode(container);
+				this.graph.nodeList.push(node);
+				pairs.push(new ContainerNodePair(container, node));
+
+			} else {//NODE_LIST
+				this.extractNodesFrom(container);
+			}
 		}
 
 		//find attributes for each child
@@ -88,12 +101,12 @@ export class GFConsumer {
 
 
 
-	private makeSimpleNode(nodeContainer: ParentParseTreeNode):GFNode {
+	private makeSimpleNode(nodeContainer: ParentParseTreeNode): GFNode {
 		//retrieve id from first child
 		let id = nodeContainer.children[0].getLexeme().valueIn(this.input);
-		
-		let node:GFNode = this.graph.getNodeById(id,true);
-		
+
+		let node: GFNode = this.graph.getNodeById(id, true);
+
 		//retrieve possible type from second child
 		let typeContainer = <ParentParseTreeNode>nodeContainer.children[1];
 		if (typeContainer.children.length == 3) {
@@ -111,7 +124,13 @@ export class GFConsumer {
 
 				//container is an attribute container
 				if (container.getNonTerminal().representation == ATTRIBUTE) {
-					this.extractAttribute(container, node);
+					//this will only have 3 children :
+
+					//first is the identifier
+					let attributeName = container.children[0].getLexeme().valueIn(this.input);
+					//second is equals sign
+					//third is the value itself
+					this.extractValue(<ParentParseTreeNode>container.children[2], attributeName, node);
 				} else {
 					//container can only be an attribute list container,in which case recurse
 					this.extractAttributeList(container, node);
@@ -120,50 +139,90 @@ export class GFConsumer {
 		}
 	}
 
-	private extractAttribute(attributeContainer: ParentParseTreeNode, node: GFNode) {
-
-		//this will only have 3 children :
-		let attribute = new GFAttribute();
-		//first is the identifier
-		attribute.name = attributeContainer.children[0].getLexeme().valueIn(this.input);
-
-		//second is equals sign
-		//third is the value itself
-		this.extractValue(<ParentParseTreeNode>attributeContainer.children[2], attribute,node);
-		node.attributes.push(attribute);
-	}
-
-	private extractValue(valueContainer: ParentParseTreeNode, attribute: GFAttribute,node:GFNode) {
+	private extractValue(valueContainer: ParentParseTreeNode, attributeName: string, node: GFNode) {
 		let valueTypeContainer = <ParentParseTreeNode>valueContainer.children[0];
 		//check the expression of the non terminal
 		if (valueTypeContainer.getNonTerminal().representation == INTEGER) {
 			//get the only lexeme from this container, and parse it to create a integer value
-			let value = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
-			attribute.object = new GFIntegerObject(parseInt(value));
+			let valueFromInput = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
+			let value = parseInt(valueFromInput);
+			let valueNode = new GFNode();
+			valueNode.type = INTEGER_TYPE;
+			valueNode.value = value;
+			let attributeEdge = new GFEdge();
+			attributeEdge.name = attributeName;
+			attributeEdge.node1 = node;
+			attributeEdge.node2 = valueNode;
+			node.attributeEdges.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == FLOAT) {
 			//get the 2 lexemes on the outer side, and parse it to create a float value
 			let beforeDecimal = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
 			let afterDecimal = valueTypeContainer.children[2].getLexeme().valueIn(this.input);
-			attribute.object = new GFIntegerObject(parseFloat(beforeDecimal + "." + afterDecimal));
+			let value = parseFloat(beforeDecimal + "." + afterDecimal);
+
+			let valueNode = new GFNode();
+			valueNode.type=FLOAT_TYPE;
+			valueNode.value=value;
+			let attributeEdge=new GFEdge();
+			attributeEdge.name=attributeName;
+			attributeEdge.node1=node;
+			attributeEdge.node2=valueNode;
+			node.attributeEdges.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == STRING) {
 			//get the only lexeme from this container, and parse it to create a string value
-			let value = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
-			attribute.object = new GFStringObject(value);
+			let valueFromInput = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
+			let valueNode = new GFNode();
+			valueNode.type=STRING_TYPE;
+			valueNode.value=valueFromInput;
+			let attributeEdge=new GFEdge();
+			attributeEdge.name=attributeName;
+			attributeEdge.node1=node;
+			attributeEdge.node2=valueNode;
+			node.attributeEdges.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == EDGE) {
-			let edge = new GFEdge();
-			edge.name = attribute.name;
-			edge.name = attribute.name;
 			let outgoingNodeId = valueTypeContainer.children[1].getLexeme().valueIn(this.input)
-			let outgoingNode = this.graph.getNodeById(outgoingNodeId,true);
+			let outgoingNode = this.graph.getNodeById(outgoingNodeId, true);
+			let edge = new GFEdge();
+			edge.name=attributeName;
+			edge.node1 = node;
+			edge.node2 = outgoingNode;
+			node.edgeList.push(edge);//pushing to edge list
 
-			edge.directed=true;
-			edge.node1=node;
-			edge.node2=outgoingNode;
-			node.edgeList.push(edge);
-
-		}else if (valueTypeContainer.getNonTerminal().representation == ARRAY) {
+		} else if (valueTypeContainer.getNonTerminal().representation == ARRAY) {
+			
+			let arrayNode = new GFNode();
+			arrayNode.type=ARRAY_TYPE;
+			let attributeEdge=new GFEdge();
+			attributeEdge.name=attributeName;
+			attributeEdge.node1=node;
+			attributeEdge.node2=arrayNode;
+			node.attributeEdges.push(attributeEdge);
+			this.extractValueList(<ParentParseTreeNode>valueTypeContainer.children[1],0,arrayNode);//the middle child contains the value list
 
 		}
+	}
+
+	private extractValueList(valueListContainer:ParentParseTreeNode,index:number,arrayNode:GFNode){
+		//take the first child all the time
+		let child=valueListContainer.children[0];
+
+		//possibly this could be null because of epsilon in the value list rule
+		if(child==null){
+			return ;
+		}
+
+		//first child will always be a value node
+		let attributeName=index+"";
+		this.extractValue(<ParentParseTreeNode>child,attributeName,arrayNode);
+
+		//three children means value , value list
+		//which means second child will always be comma
+
+		//and third child will always be value list
+		let childValueListContainer=<ParentParseTreeNode>valueListContainer.children[2];
+		this.extractValueList(childValueListContainer,index+1,arrayNode);
+
+		
 	}
 
 }

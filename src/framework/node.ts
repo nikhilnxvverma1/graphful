@@ -4,8 +4,12 @@ import { GFAttribute } from './attribute';
 export class GFNode{
 	id:string;
 	type:string;
-	edgeList:GFEdge[];
-	attributes:GFAttribute[]=[];
+	edgeList:GFEdge[]=[];
+	/** Attributes associated to this node, weather they are primitives or array objects */
+	attributeEdges:GFEdge[]=[];
+	/** In case this node is a primitive, this is where the final value is stored */
+	value:any;
+	// attributes:GFAttribute[]=[];
 	/** Placeholder nodes are used by edges that don't have actual nodes prepared up yet */
 	placeholder=false;
 

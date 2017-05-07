@@ -169,7 +169,7 @@ export class ParserTable{
 		// let graphviz=this.generateGraphViz(processedStates);
 		// console.log(`Graphviz:${this.cfg.displayName}`);
 		// console.log(graphviz);
-		this.printParsingTable();
+		// this.printParsingTable();
 	}
 
 

@@ -7,7 +7,7 @@ import { GFEdge } from 'framework/edge';
 
 describe('Graphful', () => {
 
-	describe('Syntax parsing', () => {
+	describe('Syntax', () => {
 		it('should successfully parse single node: node1{};',()=>{
 			let consumer=new GFConsumer("node1{};");
 			expect(consumer.compile()).toBeTruthy();
@@ -59,7 +59,7 @@ describe('Graphful', () => {
 		});
 	});
 
-	describe('Semantic graph', () => {
+	describe('Semantic', () => {
 		
 		it('should yield single node for node1{};',()=>{
 			let consumer=new GFConsumer("node1{};");
@@ -83,14 +83,14 @@ describe('Graphful', () => {
 			expect(node.id).toBe("node1");
 
 			//test if attributes match
-			expect(node.attributes[0].name).toBe("foo");
-			expect(node.attributes[0].object.value).toBe(23);
+			// expect(node.attributes[0].name).toBe("foo");
+			// expect(node.attributes[0].object.value).toBe(23);
 
-			expect(node.attributes[1].name).toBe("bar");
-			expect(node.attributes[1].object.value).toBe("asfga");
+			// expect(node.attributes[1].name).toBe("bar");
+			// expect(node.attributes[1].object.value).toBe("asfga");
 
-			expect(node.attributes[2].name).toBe("baz");
-			expect(node.attributes[2].object.value).toBe(2.3);
+			// expect(node.attributes[2].name).toBe("baz");
+			// expect(node.attributes[2].object.value).toBe(2.3);
 		});
 
 		it('should yield 2 nodes connected via edge for node1<MyType>{foo=(node2)}; node2{}',()=>{
