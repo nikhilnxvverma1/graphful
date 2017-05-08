@@ -162,7 +162,7 @@ export class GFConsumer {
 			attributeEdge.name = attributeName;
 			attributeEdge.node1 = node;
 			attributeEdge.node2 = valueNode;
-			node.attributeEdges.push(attributeEdge);
+			node.edgeList.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == FLOAT) {
 			//the input can be negative, so check the lexeme type of the first terminal //TODO duplicate code
 			let isNegative=false;
@@ -186,7 +186,7 @@ export class GFConsumer {
 			attributeEdge.name=attributeName;
 			attributeEdge.node1=node;
 			attributeEdge.node2=valueNode;
-			node.attributeEdges.push(attributeEdge);
+			node.edgeList.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == STRING) {
 			//get the only lexeme from this container, and parse it to create a string value
 			let valueFromInput = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
@@ -197,7 +197,7 @@ export class GFConsumer {
 			attributeEdge.name=attributeName;
 			attributeEdge.node1=node;
 			attributeEdge.node2=valueNode;
-			node.attributeEdges.push(attributeEdge);
+			node.edgeList.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == EDGE) {
 			let outgoingNodeId = valueTypeContainer.children[1].getLexeme().valueIn(this.input)
 			let outgoingNode = this.graph.getNodeById(outgoingNodeId, true);
@@ -205,7 +205,12 @@ export class GFConsumer {
 			edge.name=attributeName;
 			edge.node1 = node;
 			edge.node2 = outgoingNode;
-			node.edgeList.push(edge);//pushing to edge list
+			outgoingNode.value=outgoingNode;//because this is an attribute, it needs to have a value of itself
+			node.edgeList.push(edge);
+
+			//because this is an edge between two object nodes,we push to graph edge list
+			this.graph.edgeList.push(edge);//TODO for arrays, a recursive call will make an edge between a node and array in graph
+		
 
 		} else if (valueTypeContainer.getNonTerminal().representation == ARRAY) {
 			
@@ -216,7 +221,7 @@ export class GFConsumer {
 			attributeEdge.node1=node;
 			attributeEdge.node2=arrayNode;
 			arrayNode.value=arrayNode;//because this is an attribute, it needs to have a value of itself
-			node.attributeEdges.push(attributeEdge);
+			node.edgeList.push(attributeEdge);
 			this.extractValueList(<ParentParseTreeNode>valueTypeContainer.children[1],0,arrayNode);//the middle child contains the value list
 
 		}

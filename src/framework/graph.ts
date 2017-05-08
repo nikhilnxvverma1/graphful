@@ -2,7 +2,9 @@ import { GFNode } from './node';
 import { GFEdge } from './edge';
 
 export class GFGraph{
+	/** Holds all higher level nodes (list of Object nodes) */
 	nodeList:GFNode[]=[];
+	/** Holds only edges that act as links between two 'Object' nodes or an 'Object' node and an 'Array' node */
 	edgeList:GFEdge[]=[];
 
 	//methods for filtering nodes based on a selector
@@ -16,6 +18,8 @@ export class GFGraph{
 		if(makeIfNeeded){
 			let node=new GFNode();
 			node.id=id;
+			//by default the node will hold a value of itself to represent an object
+			node.value=node;
 			node.placeholder=true;
 			return node;
 		}

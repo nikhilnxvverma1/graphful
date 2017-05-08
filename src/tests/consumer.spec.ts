@@ -6,7 +6,7 @@ import { GFNode } from 'framework/node';
 import { GFEdge } from 'framework/edge';
 import { readFileSync } from 'fs';
 
-xdescribe('Graphful', () => {
+describe('Graphful', () => {
 
 	describe('Syntax', () => {
 		it('should successfully parse single node: node1{};',()=>{
@@ -77,6 +77,15 @@ xdescribe('Graphful', () => {
 			expect(node.type).toBe("MyType");
 		});
 
+		it('should work for negative floating attributes node1<MyType>{foo= -2.4};',()=>{
+			let consumer=new GFConsumer("node1<MyType>{foo= -2.4};");
+			consumer.compile();
+			let node=consumer.graph.nodeList[0];
+			expect(node.id).toBe("node1");
+			expect(node.type).toBe("MyType");
+			expect(node.getAttributeValue("foo")).toBe(-2.4);
+		});
+
 		it('should yield node with correct attributes for int, string and float: node1{foo=23,bar=`asfga`,baz=2.3,};',()=>{
 			let consumer=new GFConsumer("node1{foo=23,bar=`asfga`,baz=2.3};");
 			consumer.compile();
@@ -84,14 +93,9 @@ xdescribe('Graphful', () => {
 			expect(node.id).toBe("node1");
 
 			//test if attributes match
-			// expect(node.attributes[0].name).toBe("foo");
-			// expect(node.attributes[0].object.value).toBe(23);
-
-			// expect(node.attributes[1].name).toBe("bar");
-			// expect(node.attributes[1].object.value).toBe("asfga");
-
-			// expect(node.attributes[2].name).toBe("baz");
-			// expect(node.attributes[2].object.value).toBe(2.3);
+			expect(node.getAttributeValue("foo")).toBe(23);
+			expect(node.getAttributeValue("bar")).toBe("asfga");
+			expect(node.getAttributeValue("baz")).toBe(2.3);
 		});
 
 		it('should yield 2 nodes connected via edge for node1<MyType>{foo=(node2)}; node2{}',()=>{
@@ -192,7 +196,7 @@ describe("Graphics Specs",()=>{
 		expect(sceneNode.type).toBe("GLScene");
 
 		//camera
-		let cameraNode=sceneNode.getFirstConnectedNodeBy("camera");
+		let cameraNode=sceneNode.getAttributeValue("camera");
 		expect(cameraNode).toBeTruthy();
 		expect(cameraNode.type).toBe("Camera");
 		expect(cameraNode.getAttributeValue("origin_z")).toBe(5);
@@ -207,7 +211,7 @@ describe("Graphics Specs",()=>{
 		expect(cameraNode.getAttributeValue("bottom")).toBe(-10);
 		
 		//ambientLight
-		let ambientLightNode=sceneNode.getFirstConnectedNodeBy("ambientLight");
+		let ambientLightNode=sceneNode.getAttributeValue("ambientLight");
 		expect(ambientLightNode).toBeTruthy();
 		expect(ambientLightNode.type).toBe("Color");
 		expect(ambientLightNode.getAttributeValue("r")).toBe(200);
@@ -222,7 +226,7 @@ describe("Graphics Specs",()=>{
 		expect(lightArray.edgeList.length).toBe(2);
 
 		//light1
-		let light1Node=lightArray.getFirstConnectedNodeBy("0");
+		let light1Node=lightArray.getAttributeValue("0");
 		expect(light1Node).toBeTruthy();
 		expect(light1Node.type).toBe("Light");
 		expect(light1Node.getAttributeValue("x")).toBe(0);
@@ -231,7 +235,7 @@ describe("Graphics Specs",()=>{
 		expect(light1Node.getAttributeValue("initWith")).toBe("#FFFF36");
 
 		//light2
-		let light2Node=lightArray.getFirstConnectedNodeBy("1");
+		let light2Node=lightArray.getAttributeValue("1");
 		expect(light2Node).toBeTruthy();
 		expect(light2Node.type).toBe("Light");
 		expect(light2Node.getAttributeValue("x")).toBe(15);
@@ -247,7 +251,7 @@ describe("Graphics Specs",()=>{
 		expect(drawableArray.edgeList.length).toBe(3);
 
 		//cylinder
-		let cylinder=drawableArray.getFirstConnectedNodeBy("0");
+		let cylinder=drawableArray.getAttributeValue("0");
 		expect(cylinder).toBeTruthy();
 		expect(cylinder.type).toBe("CustomVertexDrawable");
 		expect(cylinder.getAttributeValue("shape")).toBe("cylinder");
@@ -256,12 +260,12 @@ describe("Graphics Specs",()=>{
 		let cylinderArgs=cylinder.getAttributeValue("args");
 		expect(cylinderArgs.type).toBe("Array");
 		expect(cylinderArgs).toBeTruthy();
-		expect(cylinderArgs.attributeEdges.length).toBe(2);
+		expect(cylinderArgs.edgeList.length).toBe(2);
 		expect(cylinderArgs.getAttributeValue("0")).toBe(7);
 		expect(cylinderArgs.getAttributeValue("1")).toBe(5);
 
 		//cube
-		let cube=drawableArray.getFirstConnectedNodeBy("1");
+		let cube=drawableArray.getAttributeValue("1");
 		expect(cube).toBeTruthy();
 		expect(cube.type).toBe("CustomVertexDrawable");
 		expect(cube.getAttributeValue("shape")).toBe("cube");
@@ -271,11 +275,11 @@ describe("Graphics Specs",()=>{
 		let cubeArgs=cube.getAttributeValue("args");
 		expect(cubeArgs.type).toBe("Array");
 		expect(cubeArgs).toBeTruthy();
-		expect(cubeArgs.attributeEdges.length).toBe(1);
+		expect(cubeArgs.edgeList.length).toBe(1);
 		expect(cubeArgs.getAttributeValue("0")).toBe(3);
 
 		//sphere
-		let sphere=drawableArray.getFirstConnectedNodeBy("2");
+		let sphere=drawableArray.getAttributeValue("2");
 		expect(sphere).toBeTruthy();
 		expect(sphere.type).toBe("CustomVertexDrawable");
 		expect(sphere.getAttributeValue("shape")).toBe("sphere");
@@ -285,7 +289,7 @@ describe("Graphics Specs",()=>{
 		let sphereArgs=sphere.getAttributeValue("args");
 		expect(sphereArgs.type).toBe("Array");
 		expect(sphereArgs).toBeTruthy();
-		expect(sphereArgs.attributeEdges.length).toBe(1);
+		expect(sphereArgs.edgeList.length).toBe(1);
 		expect(sphereArgs.getAttributeValue("0")).toBe(4);
 
 		

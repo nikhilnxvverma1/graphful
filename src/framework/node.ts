@@ -4,41 +4,20 @@ import { GFAttribute } from './attribute';
 export class GFNode{
 	id:string;
 	type:string;
+	/** Attributes associated to this node, weather they are primitives,array objects or other nodes*/
 	edgeList:GFEdge[]=[];
-	/** Attributes associated to this node, weather they are primitives or array objects */
-	attributeEdges:GFEdge[]=[];
-	/** In case this node is a primitive, this is where the final value is stored */
+	/** 
+	 * If this node represents an object, this will be a reference to itself, otherwise, 
+	 * a node may represent a primitive, in which case it will hold simple value like a string or a number
+	 */
 	value:any;
 	// attributes:GFAttribute[]=[];
 	/** Placeholder nodes are used by edges that don't have actual nodes prepared up yet */
 	placeholder=false;
 
-	getConnectedNodes(edgeName:string):GFNode[]{
-		let connectedNodes:GFNode[]=[];
-		for(let i=0;i<this.edgeList.length;i++){
-			if(this.edgeList[i].name==edgeName){
-				connectedNodes.push(this.edgeList[i].node2);
-			}
-		}
-		return connectedNodes;
-	}
-
-	getFirstConnectedNodeBy(edgeName:string):GFNode{
-		let connectedNode:GFNode;
-		for(let i=0;i<this.edgeList.length;i++){
-			if(this.edgeList[i].name==edgeName){
-				return this.edgeList[i].node2;
-			}
-		}
-		return null;
-	}
-
 	getAttributeValue(attributeName:string):any{
 		let connectedNode:GFNode;
-		let attributeEdge=this.edgeBy(attributeName,this.attributeEdges);
-		if(attributeEdge==null){
-			attributeEdge=this.edgeBy(attributeName,this.edgeList);
-		}
+		let attributeEdge=this.edgeBy(attributeName,this.edgeList);
 		
 		if(attributeEdge!=null){
 			return attributeEdge.node2.value;
