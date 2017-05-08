@@ -42,8 +42,8 @@ export class GFConsumer {
 		`${ATTRIBUTE_LIST} -> ${ATTRIBUTE} $11 ${ATTRIBUTE_LIST}| ${ATTRIBUTE} | $E`,
 		`${ATTRIBUTE} -> $3 $34 ${VALUE}`,
 		`${VALUE} -> ${INTEGER} | ${FLOAT} | ${STRING} | ${EDGE} | ${ARRAY}`,
-		`${INTEGER} -> $4`,
-		`${FLOAT} -> $4 $37 $4`,
+		`${INTEGER} -> $4 | $6 $4`,
+		`${FLOAT} -> $4 $37 $4 | $6 $4 $37 $4`,
 		`${STRING} -> $38`,
 		`${EDGE} -> $23 $3 $24`,
 		`${ARRAY} -> $19 ${VALUE_LIST} $20`,
@@ -143,9 +143,18 @@ export class GFConsumer {
 		let valueTypeContainer = <ParentParseTreeNode>valueContainer.children[0];
 		//check the expression of the non terminal
 		if (valueTypeContainer.getNonTerminal().representation == INTEGER) {
-			//get the only lexeme from this container, and parse it to create a integer value
-			let valueFromInput = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
+			//the input can be negative, so check the lexeme type of the first terminal
+			let isNegative=false;
+			let offset=0;
+			if(valueTypeContainer.children[0].getLexeme().type==lexer.LexemeType.Minus){
+				isNegative=true;
+				offset=1;
+			}
+			let valueFromInput = valueTypeContainer.children[offset+0].getLexeme().valueIn(this.input);//this will always be positive
 			let value = parseInt(valueFromInput);
+			if(isNegative){
+				value=-value;
+			}
 			let valueNode = new GFNode();
 			valueNode.type = INTEGER_TYPE;
 			valueNode.value = value;
@@ -155,11 +164,21 @@ export class GFConsumer {
 			attributeEdge.node2 = valueNode;
 			node.attributeEdges.push(attributeEdge);
 		} else if (valueTypeContainer.getNonTerminal().representation == FLOAT) {
-			//get the 2 lexemes on the outer side, and parse it to create a float value
-			let beforeDecimal = valueTypeContainer.children[0].getLexeme().valueIn(this.input);
-			let afterDecimal = valueTypeContainer.children[2].getLexeme().valueIn(this.input);
-			let value = parseFloat(beforeDecimal + "." + afterDecimal);
+			//the input can be negative, so check the lexeme type of the first terminal //TODO duplicate code
+			let isNegative=false;
+			let offset=0;
+			if(valueTypeContainer.children[0].getLexeme().type==lexer.LexemeType.Minus){
+				isNegative=true;
+				offset=1;
+			}
 
+			//get the 2 lexemes on the outer side, and parse it to create a float value
+			let beforeDecimal = valueTypeContainer.children[offset+0].getLexeme().valueIn(this.input);
+			let afterDecimal = valueTypeContainer.children[offset+2].getLexeme().valueIn(this.input);
+			let value = parseFloat(beforeDecimal + "." + afterDecimal);
+			if(isNegative){
+				value=-value;
+			}
 			let valueNode = new GFNode();
 			valueNode.type=FLOAT_TYPE;
 			valueNode.value=value;
@@ -215,12 +234,14 @@ export class GFConsumer {
 		let attributeName=index+"";
 		this.extractValue(<ParentParseTreeNode>child,attributeName,arrayNode);
 
-		//three children means value , value list
-		//which means second child will always be comma
+		if(valueListContainer.children.length>2){
+			//three children means value , value list
+			//which means second child will always be comma
 
-		//and third child will always be value list
-		let childValueListContainer=<ParentParseTreeNode>valueListContainer.children[2];
-		this.extractValueList(childValueListContainer,index+1,arrayNode);
+			//and third child will always be value list
+			let childValueListContainer=<ParentParseTreeNode>valueListContainer.children[2];
+			this.extractValueList(childValueListContainer,index+1,arrayNode);
+		}
 
 		
 	}
