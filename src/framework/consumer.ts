@@ -23,10 +23,10 @@ const ARRAY = "Array";
 const EDGE = "Edge";
 
 
-const INTEGER_TYPE = "Integer";
-const FLOAT_TYPE = "Float";
-const STRING_TYPE = "String";
-const ARRAY_TYPE = "Array";
+export const INTEGER_TYPE = "Integer";
+export const FLOAT_TYPE = "Float";
+export const STRING_TYPE = "String";
+export const ARRAY_TYPE = "Array";
 
 /** Converts graphful code into a graph data structure */
 export class GFConsumer {
@@ -215,6 +215,7 @@ export class GFConsumer {
 			attributeEdge.name=attributeName;
 			attributeEdge.node1=node;
 			attributeEdge.node2=arrayNode;
+			arrayNode.value=arrayNode;//because this is an attribute, it needs to have a value of itself
 			node.attributeEdges.push(attributeEdge);
 			this.extractValueList(<ParentParseTreeNode>valueTypeContainer.children[1],0,arrayNode);//the middle child contains the value list
 

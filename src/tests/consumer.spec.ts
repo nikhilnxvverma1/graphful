@@ -177,13 +177,119 @@ describe("Graphics Specs",()=>{
 			args=[4]
 		};
 
-
 	`;
 	it("should parse simple graphics code",()=>{
 		let consumer=new GFConsumer(specs);
 		let syntaxOk=consumer.compile();
 		expect(syntaxOk).toBeTruthy();
+		checkSpecsSyntax(consumer.graph);
 	})
+
+	function checkSpecsSyntax(graph:GFGraph){
+		expect(graph.nodeList.length).toBe(8);
+
+		let sceneNode=graph.getNodeById("scene");
+		expect(sceneNode.type).toBe("GLScene");
+
+		//camera
+		let cameraNode=sceneNode.getFirstConnectedNodeBy("camera");
+		expect(cameraNode).toBeTruthy();
+		expect(cameraNode.type).toBe("Camera");
+		expect(cameraNode.getAttributeValue("origin_z")).toBe(5);
+		expect(cameraNode.getAttributeValue("origin_y")).toBe(3);
+		expect(cameraNode.getAttributeValue("lookAt_y")).toBe(-1);
+		expect(cameraNode.getAttributeValue("up_y")).toBe(1);
+		expect(cameraNode.getAttributeValue("near")).toBe(1);
+		expect(cameraNode.getAttributeValue("far")).toBe(100);
+		expect(cameraNode.getAttributeValue("left")).toBe(-10);
+		expect(cameraNode.getAttributeValue("right")).toBe(10);
+		expect(cameraNode.getAttributeValue("top")).toBe(10);
+		expect(cameraNode.getAttributeValue("bottom")).toBe(-10);
+		
+		//ambientLight
+		let ambientLightNode=sceneNode.getFirstConnectedNodeBy("ambientLight");
+		expect(ambientLightNode).toBeTruthy();
+		expect(ambientLightNode.type).toBe("Color");
+		expect(ambientLightNode.getAttributeValue("r")).toBe(200);
+		expect(ambientLightNode.getAttributeValue("g")).toBe(200);
+		expect(ambientLightNode.getAttributeValue("b")).toBe(200);
+		expect(ambientLightNode.getAttributeValue("a")).toBe(255);
+
+		//light list
+		let lightArray=sceneNode.getAttributeValue("lightList");
+		expect(lightArray.type).toBe("Array");
+		expect(lightArray).toBeTruthy();
+		expect(lightArray.edgeList.length).toBe(2);
+
+		//light1
+		let light1Node=lightArray.getFirstConnectedNodeBy("0");
+		expect(light1Node).toBeTruthy();
+		expect(light1Node.type).toBe("Light");
+		expect(light1Node.getAttributeValue("x")).toBe(0);
+		expect(light1Node.getAttributeValue("y")).toBe(2);
+		expect(light1Node.getAttributeValue("z")).toBe(5);
+		expect(light1Node.getAttributeValue("initWith")).toBe("#FFFF36");
+
+		//light2
+		let light2Node=lightArray.getFirstConnectedNodeBy("1");
+		expect(light2Node).toBeTruthy();
+		expect(light2Node.type).toBe("Light");
+		expect(light2Node.getAttributeValue("x")).toBe(15);
+		expect(light2Node.getAttributeValue("y")).toBe(0);
+		expect(light2Node.getAttributeValue("z")).toBe(-2);
+		expect(light2Node.getAttributeValue("initWith")).toBe("#DE72A4");
+		
+
+		//drawable list
+		let drawableArray=sceneNode.getAttributeValue("drawableList");
+		expect(drawableArray.type).toBe("Array");
+		expect(drawableArray).toBeTruthy();
+		expect(drawableArray.edgeList.length).toBe(3);
+
+		//cylinder
+		let cylinder=drawableArray.getFirstConnectedNodeBy("0");
+		expect(cylinder).toBeTruthy();
+		expect(cylinder.type).toBe("CustomVertexDrawable");
+		expect(cylinder.getAttributeValue("shape")).toBe("cylinder");
+		
+		//cylinder args
+		let cylinderArgs=cylinder.getAttributeValue("args");
+		expect(cylinderArgs.type).toBe("Array");
+		expect(cylinderArgs).toBeTruthy();
+		expect(cylinderArgs.attributeEdges.length).toBe(2);
+		expect(cylinderArgs.getAttributeValue("0")).toBe(7);
+		expect(cylinderArgs.getAttributeValue("1")).toBe(5);
+
+		//cube
+		let cube=drawableArray.getFirstConnectedNodeBy("1");
+		expect(cube).toBeTruthy();
+		expect(cube.type).toBe("CustomVertexDrawable");
+		expect(cube.getAttributeValue("shape")).toBe("cube");
+		expect(cube.getAttributeValue("x")).toBe(-15);
+		
+		//cube args
+		let cubeArgs=cube.getAttributeValue("args");
+		expect(cubeArgs.type).toBe("Array");
+		expect(cubeArgs).toBeTruthy();
+		expect(cubeArgs.attributeEdges.length).toBe(1);
+		expect(cubeArgs.getAttributeValue("0")).toBe(3);
+
+		//sphere
+		let sphere=drawableArray.getFirstConnectedNodeBy("2");
+		expect(sphere).toBeTruthy();
+		expect(sphere.type).toBe("CustomVertexDrawable");
+		expect(sphere.getAttributeValue("shape")).toBe("sphere");
+		expect(sphere.getAttributeValue("x")).toBe(16);
+		
+		//sphere args
+		let sphereArgs=sphere.getAttributeValue("args");
+		expect(sphereArgs.type).toBe("Array");
+		expect(sphereArgs).toBeTruthy();
+		expect(sphereArgs.attributeEdges.length).toBe(1);
+		expect(sphereArgs.getAttributeValue("0")).toBe(4);
+
+		
+	}
 });
 
 
