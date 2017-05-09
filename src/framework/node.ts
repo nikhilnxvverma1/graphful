@@ -10,7 +10,6 @@ export class GFNode{
 	 * a node may represent a primitive, in which case it will hold simple value like a string or a number
 	 */
 	value:any;
-	// attributes:GFAttribute[]=[];
 	/** Placeholder nodes are used by edges that don't have actual nodes prepared up yet */
 	placeholder=false;
 
@@ -32,5 +31,9 @@ export class GFNode{
 			}
 		}
 		return null;
+	}
+
+	toString():string{
+		return this.id;
 	}
 }

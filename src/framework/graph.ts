@@ -37,14 +37,45 @@ export class GFGraph{
 	}
 
 	/** Returns nodes in a path in the object graph. TODO Not ready yet */
-	getNodeInPath(path:string):GFNode{
+	valueInPath(path:string):any{
 		let pathItems:string[]=path.split(".");
-		let rootNode=this.getNodeById(pathItems[0]);
-		let parent=rootNode;
-		let leaf=rootNode;
-		for(let i=0;i<pathItems.length;i++){
-			//TODO do this recursively
+		let nodeList:GFNode[]=this.nodeList;
+		let currentNode:GFNode=null;
+		let i=0;
+		while(i<pathItems.length){
+			let item=pathItems[i];
+
+			let isArray=false;
+			let arrayIndex=-1;//by default array index is not applicable
+			let identifier=item;//by default identifier is same as the current item
+
+			if(item.endsWith("]")){//indexed
+				isArray=true;
+				let openBracket=item.lastIndexOf("[");
+				let closeBracket=item.lastIndexOf("]");
+				let numberInsideBrackets=item.substring(openBracket+1,closeBracket);//excluding ending bracket
+				arrayIndex=parseInt(numberInsideBrackets);
+				identifier=item.substring(0,openBracket);
+			}
+
+			if(i==0){
+				currentNode=this.getNodeById(identifier);
+			}else{
+				currentNode=currentNode.getAttributeValue(identifier);
+			}
+
+			//there is no node if chain breaks at this point
+			if(currentNode==null){
+				return null;//TODO send error
+			}
+
+			if(isArray){
+				currentNode=currentNode.getAttributeValue(""+arrayIndex);
+			}
+
+			i++;
 		}
-		return leaf;
+		
+		return currentNode;
 	}
 }

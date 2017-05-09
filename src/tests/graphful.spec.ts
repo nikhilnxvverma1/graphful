@@ -182,9 +182,9 @@ describe("Graphics Specs",()=>{
 		};
 
 	`;
+	let compiler=new GFCompiler(specs);
+	let syntaxOk=compiler.compile();
 	it("should parse simple graphics code",()=>{
-		let compiler=new GFCompiler(specs);
-		let syntaxOk=compiler.compile();
 		expect(syntaxOk).toBeTruthy();
 		checkSpecsSyntax(compiler.graph);
 	})
@@ -291,9 +291,65 @@ describe("Graphics Specs",()=>{
 		expect(sphereArgs).toBeTruthy();
 		expect(sphereArgs.edgeList.length).toBe(1);
 		expect(sphereArgs.getAttributeValue("0")).toBe(4);
-
-		
 	}
+
+	describe("path navigation",()=>{
+
+		let onlyScene=`scene`;
+		it("should return node for single node : "+onlyScene,()=>{
+			let graph=compiler.graph;
+			let sceneNode=graph.getNodeById("scene");
+			let value=graph.valueInPath(onlyScene);
+			expect(value).toBe(sceneNode);
+			
+		});
+
+		let singleConnection=`scene.camera`
+		it("should return node for single dot operator : "+singleConnection,()=>{
+			
+			let graph=compiler.graph;
+			let cameraNode=graph.getNodeById("camera");
+			let value=graph.valueInPath(singleConnection);
+			expect(value).toBe(cameraNode);
+		});
+
+		let doubleConnection=`scene.camera.far`
+		it("should return node for double dot operator : "+doubleConnection,()=>{
+			
+			let graph=compiler.graph;
+			let cameraNode=graph.getNodeById("camera");
+			let value=graph.valueInPath(doubleConnection);
+			expect(value).toBe(cameraNode.getAttributeValue("far"));
+		});
+
+		let indexConnection=`scene.drawableList[1]`
+		it("should return node for array indexed : "+indexConnection,()=>{
+			
+			let graph=compiler.graph;
+			let sceneNode=graph.getNodeById("scene");
+
+			let drawableArray=sceneNode.getAttributeValue("drawableList");
+			expect(drawableArray.type).toBe("Array");
+			let cube=drawableArray.getAttributeValue("1");
+
+			let value=graph.valueInPath(indexConnection);
+			expect(value).toBe(cube);
+		});
+
+		let indexConnectionPlusDot=`scene.drawableList[1].x`
+		it("should return node for array indexed plus dot : "+indexConnectionPlusDot,()=>{
+			
+			let graph=compiler.graph;
+			let sceneNode=graph.getNodeById("scene");
+
+			let drawableArray=sceneNode.getAttributeValue("drawableList");
+			expect(drawableArray.type).toBe("Array");
+			let cube=drawableArray.getAttributeValue("1");
+
+			let value=graph.valueInPath(indexConnectionPlusDot);
+			expect(value).toBe(-15);
+		});
+	});
 });
 
 
