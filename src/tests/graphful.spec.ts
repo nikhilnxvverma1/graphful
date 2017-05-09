@@ -1,6 +1,6 @@
 import { ParserTable } from 'framework/compiler/parser-table';
 import { ContextFreeGrammer,ParentParseTreeNode,LeafParseTreeNode } from 'framework/compiler/syntax-parser';
-import { GFConsumer } from 'framework/consumer';
+import { GFCompiler } from 'framework/compiler/graphful';
 import { GFGraph } from 'framework/graph';
 import { GFNode } from 'framework/node';
 import { GFEdge } from 'framework/edge';
@@ -10,86 +10,86 @@ describe('Graphful', () => {
 
 	describe('Syntax', () => {
 		it('should successfully parse single node: node1{};',()=>{
-			let consumer=new GFConsumer("node1{};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse type: node1<MyType>{};',()=>{
-			let consumer=new GFConsumer("node1<MyType>{};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1<MyType>{};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse 2 nodes: node1<MyType>{};node2<SomeOtherType>{};',()=>{
-			let consumer=new GFConsumer("node1<MyType>{};node2<SomeOtherType>{};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1<MyType>{};node2<SomeOtherType>{};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse 1 attributes of int: node1{foo=23};',()=>{
-			let consumer=new GFConsumer("node1{foo=23};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{foo=23};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse 1 attributes of string: node1{foo=`osmestring`};',()=>{
-			let consumer=new GFConsumer("node1{foo=`osmestring`};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{foo=`osmestring`};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse 1 attributes of float: node1{foo=2.3};',()=>{
-			let consumer=new GFConsumer("node1{foo=2.3};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{foo=2.3};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse 2 attributes: node1{foo=23,bar=`asfga`};',()=>{
-			let consumer=new GFConsumer("node1{foo=23,bar=`asfga`};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{foo=23,bar=`asfga`};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully parse 3 attributes: node1{\n\tfoo=23,\n\tbar=`asfga`,\n\tbaz=2.3\n};',()=>{
-			let consumer=new GFConsumer("node1{\nfoo=23,\nbar=`asfga`,\nbaz=2.3};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{\nfoo=23,\nbar=`asfga`,\nbaz=2.3};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully accept ending comma in last attribute: node1{foo=23,bar=`asfga`,baz=2.3,};',()=>{
-			let consumer=new GFConsumer("node1{foo=23,bar=`asfga`,baz=2.3};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{foo=23,bar=`asfga`,baz=2.3};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 
 		it('should successfully handle spaces between attributes: node1{foo=23,		bar=`asfga`,  baz=2.3};',()=>{
-			let consumer=new GFConsumer("node1{foo=23,		bar=`asfga`,  baz=2.3};");
-			expect(consumer.compile()).toBeTruthy();
+			let compiler=new GFCompiler("node1{foo=23,		bar=`asfga`,  baz=2.3};");
+			expect(compiler.compile()).toBeTruthy();
 		});
 	});
 
 	describe('Semantic', () => {
 		
 		it('should yield single node for node1{};',()=>{
-			let consumer=new GFConsumer("node1{};");
-			consumer.compile();
-			let node=consumer.graph.nodeList[0];
+			let compiler=new GFCompiler("node1{};");
+			compiler.compile();
+			let node=compiler.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 		});
 
 		it('should yield single node for node1<MyType>{};',()=>{
-			let consumer=new GFConsumer("node1<MyType>{};");
-			consumer.compile();
-			let node=consumer.graph.nodeList[0];
+			let compiler=new GFCompiler("node1<MyType>{};");
+			compiler.compile();
+			let node=compiler.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 			expect(node.type).toBe("MyType");
 		});
 
 		it('should work for negative floating attributes node1<MyType>{foo= -2.4};',()=>{
-			let consumer=new GFConsumer("node1<MyType>{foo= -2.4};");
-			consumer.compile();
-			let node=consumer.graph.nodeList[0];
+			let compiler=new GFCompiler("node1<MyType>{foo= -2.4};");
+			compiler.compile();
+			let node=compiler.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 			expect(node.type).toBe("MyType");
 			expect(node.getAttributeValue("foo")).toBe(-2.4);
 		});
 
 		it('should yield node with correct attributes for int, string and float: node1{foo=23,bar=`asfga`,baz=2.3,};',()=>{
-			let consumer=new GFConsumer("node1{foo=23,bar=`asfga`,baz=2.3};");
-			consumer.compile();
-			let node=consumer.graph.nodeList[0];
+			let compiler=new GFCompiler("node1{foo=23,bar=`asfga`,baz=2.3};");
+			compiler.compile();
+			let node=compiler.graph.nodeList[0];
 			expect(node.id).toBe("node1");
 
 			//test if attributes match
@@ -99,16 +99,16 @@ describe('Graphful', () => {
 		});
 
 		it('should yield 2 nodes connected via edge for node1<MyType>{foo=(node2)}; node2{}',()=>{
-			let consumer=new GFConsumer("node1<MyType>{foo=(node2)}; node2{};");
-			let syntaxOk=consumer.compile();
+			let compiler=new GFCompiler("node1<MyType>{foo=(node2)}; node2{};");
+			let syntaxOk=compiler.compile();
 
 			expect(syntaxOk).toBeTruthy();
 
-			let node1=consumer.graph.nodeList[0];
+			let node1=compiler.graph.nodeList[0];
 			expect(node1.id).toBe("node1");
 			expect(node1.type).toBe("MyType");
 
-			let node2=consumer.graph.nodeList[1];
+			let node2=compiler.graph.nodeList[1];
 			expect(node2.id).toBe("node2");
 			
 			expect(node1.edgeList[0].name).toBe("foo");
@@ -183,10 +183,10 @@ describe("Graphics Specs",()=>{
 
 	`;
 	it("should parse simple graphics code",()=>{
-		let consumer=new GFConsumer(specs);
-		let syntaxOk=consumer.compile();
+		let compiler=new GFCompiler(specs);
+		let syntaxOk=compiler.compile();
 		expect(syntaxOk).toBeTruthy();
-		checkSpecsSyntax(consumer.graph);
+		checkSpecsSyntax(compiler.graph);
 	})
 
 	function checkSpecsSyntax(graph:GFGraph){

@@ -1,5 +1,4 @@
 import { GFEdge } from './edge';
-import { GFAttribute } from './attribute';
 
 export class GFNode{
 	id:string;

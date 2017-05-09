@@ -1,11 +1,9 @@
-import * as lexer from './compiler/lexical-analyzer';
-import { ParsingResult, ParsingStatus, ContextFreeGrammer, ParentParseTreeNode, LeafParseTreeNode } from './compiler/syntax-parser';
-import { ParseTreeNodeType } from './compiler/syntax-parser';
-import { GFGraph } from './graph';
-import { GFNode } from './node';
-import { GFAttribute } from './attribute';
-import { GFIntegerObject, GFFloatObject, GFArrayObject, GFStringObject, GFEdgeObject } from './object';
-import { GFEdge } from './edge';
+import * as lexer from './lexical-analyzer';
+import { ParsingResult, ParsingStatus, ContextFreeGrammer, ParentParseTreeNode, LeafParseTreeNode } from './syntax-parser';
+import { ParseTreeNodeType } from './syntax-parser';
+import { GFGraph } from '../graph';
+import { GFNode } from '../node';
+import { GFEdge } from '../edge';
 
 //Non Terminals
 const NODE_LIST = "NodeList";
@@ -29,7 +27,7 @@ export const STRING_TYPE = "String";
 export const ARRAY_TYPE = "Array";
 
 /** Converts graphful code into a graph data structure */
-export class GFConsumer {
+export class GFCompiler {
 
 	input: string;
 	graph: GFGraph;
@@ -51,14 +49,14 @@ export class GFConsumer {
 
 	];
 
-	static readonly cfg = ContextFreeGrammer.grammerFrom(GFConsumer.ruleList);
+	static readonly cfg = ContextFreeGrammer.grammerFrom(GFCompiler.ruleList);
 
 	constructor(input: string) {
 		this.input = input;
 	}
 
 	compile(): boolean {
-		this.parsingResult = GFConsumer.cfg.parse(this.input);
+		this.parsingResult = GFCompiler.cfg.parse(this.input);
 		if (this.parsingResult.status != ParsingStatus.Passed) {
 			return false;
 		}

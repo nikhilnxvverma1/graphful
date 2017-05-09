@@ -2,7 +2,7 @@ import { Component,OnInit } from '@angular/core';
 import { getLexemeList } from '../framework/compiler/lexical-analyzer';
 import * as sp from '../framework/compiler/syntax-parser';
 import {SimpleCalculator} from '../framework/compiler/simple-calculator';
-import { GFConsumer } from '../framework/consumer';
+import { GFCompiler } from '../framework/compiler/graphful';
 
 @Component({
   selector: 'app-root',
@@ -51,7 +51,7 @@ export class AppComponent implements OnInit{
 	}
 
 	testGraphfulExpression(input:string){
-		let consumer=new GFConsumer(input);
+		let consumer=new GFCompiler(input);
 		let passed=consumer.compile();
 		if(passed){
 			console.log("grammer passed");
