@@ -36,7 +36,7 @@ export class GFGraph{
 		return filteredNodes;
 	}
 
-	/** Returns nodes in a path in the object graph. TODO Not ready yet */
+	/** Returns nodes in a path in the object graph. */
 	valueInPath(path:string):any{
 		let pathItems:string[]=path.split(".");
 		let nodeList:GFNode[]=this.nodeList;
