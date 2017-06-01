@@ -1,5 +1,5 @@
 # Graphful
-Graphful is a domain specific language(DSL) for defining graph data. Unlike JSON and XML, Graphful establishes connections (as edges) between data nodes. 
+A good reason to learn Compiler design, is to create a language itself. Not necessarily a programming language but a simple data "holding" language. Graphful is a domain specific language(DSL) for defining graph data. Unlike JSON and XML, Graphful establishes connections (as edges) between data nodes. 
 
 ## Description
 To create any language, there are essentially two levels of development: The __frontend__ and the __backend__. Each contains a series of stages. The __frontend__ invloves a language's syntax, semantics and intermediate code. The __backend__ essentially comprises of the final _value_ that one aims achieve. In this case, the aim is to capture graph based data in a textual format.
